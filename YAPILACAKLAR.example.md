@@ -1,0 +1,25 @@
+# KÜRESEL ETKİ — Açık yapılacaklar (örnek / herkese açık)
+
+> Kalıcı kurallar: [`AGENTS.md`](AGENTS.md)  
+> Gerçek sunucu IP, SSH anahtarı ve kişisel yollar bu repoda **yoktur**.  
+> Yerel kopyanda `YAPILACAKLAR.md` oluşturup gizli bilgileri oraya yaz (gitignore’da).
+
+## Yerel not (kendin doldur)
+
+| Ne | Değer |
+|----|--------|
+| Canlı URL | _(kendi sunucun)_ |
+| SSH | _(kendi anahtarın)_ |
+| Deploy kökü | _(ör. /var/www/html/oyungrok)_ |
+
+## Yapılacaklar (açık)
+
+- [ ] Etki büyüklüklerinin oynayış geri bildirimiyle ince ayarı
+- [ ] Grafik overlay sistemi (müdahale işaretleri grafikte)
+- [ ] "Ne olurdu eğer" karşılaştırma modu (opsiyonel)
+
+## localStorage anahtarları (istemci)
+
+- `kureselEtkiSave_oyungrok`
+- `kureselEtkiTurnJob_oyungrok`
+- `keFeedCollapsed_oyungrok`

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Küresel Etki — Ekonomik Devlet Yönetimi</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ AŞIRI KÜÇÜK EKRAN (mobil UI bile sığmaz) ============ -->
+<div id="viewport-gate" class="hidden" aria-live="polite">
+  <div class="viewport-gate-box">
+    <div class="viewport-gate-title">C:\OYUN\EKRAN.SYS</div>
+    <h2>Ekran çok küçük</h2>
+    <p>Bu cihaz veya pencere boyutu oyunu sağlıklı gösteremiyor.</p>
+    <ul>
+      <li>Pencereyi <b>büyütün</b></li>
+      <li>Telefonu <b>dikey</b> tutup yenileyin (mobil arayüz)</li>
+      <li>Daha iyi deneyim: <b>tablet yatay</b> veya <b>masaüstü</b></li>
+    </ul>
+    <p class="viewport-gate-min">Minimum ~320×480 · Mobil dikey desteklenir</p>
+  </div>
+</div>
+
+<!-- ============ ANA MENÜ ============ -->
+<div id="screen-menu" class="screen active">
+  <div class="menu-box">
+    <h1 class="game-title">KÜRESEL ETKİ</h1>
+    <p class="game-subtitle">Bir ekonomik enstrümanı değiştirdiğinde, dünyada gerçekten ne değişiyor?</p>
+    <div class="menu-buttons">
+      <button id="btn-new-game" class="btn btn-primary btn-big">Yeni Oyun</button>
+      <button id="btn-continue" class="btn btn-big" disabled>Devam Et</button>
+      <button id="btn-about" class="btn btn-big">Nasıl Oynanır?</button>
+    </div>
+    <p class="menu-note">Paralel evrende 2026. Dünya ekonomisi istikrarlı görünüyor…<br>ama uzmanlar küresel sistemin aşırı kırılgan olduğunu söylüyor.</p>
+  </div>
+  <p class="menu-mission">Misyon: Ekonomik enstrümanların zincirleme etkilerini anlamak. Kazanmak değil; her kararın dünya üzerindeki izini görmek.</p>
+</div>
+
+<!-- ============ NASIL OYNANIR ============ -->
+<div id="screen-about" class="screen">
+  <div class="about-box">
+    <h2>Nasıl Oynanır?</h2>
+    <div id="about-content"></div>
+    <div id="about-topics" class="about-topics"></div>
+    <div id="about-topic-body" class="about-topic-body hidden"></div>
+    <div class="about-actions">
+      <button class="btn btn-primary" id="btn-about-back">Geri Dön</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ÜLKE SEÇİMİ ============ -->
+<div id="screen-country" class="screen">
+  <h2 class="screen-title">Ülkeni Seç</h2>
+  <p class="screen-sub">Felaket vurmadan önce ülkeni tanı. Her ülkenin güçlü ve zayıf yönleri farklıdır.</p>
+  <div id="country-grid" class="country-grid"></div>
+</div>
+
+<!-- ============ FELAKET EKRANI ============ -->
+<div id="screen-disaster" class="screen overlay-screen">
+  <div class="disaster-box">
+    <div class="disaster-alert">⚠ KÜRESEL KRİZ BAŞLADI ⚠</div>
+    <h2 id="disaster-name"></h2>
+    <p id="disaster-desc"></p>
+    <div id="disaster-impacts"></div>
+    <button id="btn-disaster-continue" class="btn btn-danger btn-big">Devam Et</button>
+  </div>
+</div>
+
+<!-- ============ OYUN EKRANI ============ -->
+<div id="screen-game" class="screen">
+  <!-- Masaüstü chrome (mobile-ui iken gizlenir; paneller taşınır) -->
+  <header id="game-header">
+    <div id="hdr-map" class="hdr-map"></div>
+    <div class="hdr-center">
+      <span id="hdr-country" class="hdr-country"></span>
+      <span id="hdr-date" class="hdr-date"></span>
+      <button id="btn-help" class="btn btn-small" title="Danışma Kurulu: hangi enstrümanı kullanmalıyım?">❓ Yardım</button>
+      <button id="btn-music" class="btn btn-small" type="button" title="Ses: %40 — tıkla: %100">🔉 40%</button>
+    </div>
+    <div class="hdr-right">
+      <span id="hdr-polcap" title="Siyasi Sermaye">🏛 <b>—</b></span>
+      <span id="hdr-slots" title="Kalan Müdahale Hakkı">Müdahale: <b>4/4</b></span>
+      <button id="btn-log" class="btn btn-small">Olay Günlüğü</button>
+      <button id="btn-commit" class="btn btn-primary">Onayla ve İlerle ▶</button>
+    </div>
+  </header>
+
+  <div id="game-body">
+    <aside id="panel-left">
+      <div id="left-country-head"></div>
+      <div class="panel-section"><h3>Ekonomik Göstergeler</h3><div id="left-indicators"></div></div>
+      <div class="panel-section"><h3>İç İstikrar</h3><div id="left-internal"></div></div>
+      <div class="panel-section"><h3>Aktif Politikalar</h3><div id="left-policies"></div></div>
+    </aside>
+
+    <main id="panel-center">
+      <div id="chart-controls">
+        <div id="chart-ind-buttons" class="chip-row"></div>
+        <div id="chart-range-buttons" class="chip-row"></div>
+      </div>
+      <div id="chart-wrap">
+        <canvas id="main-chart" width="820" height="360"></canvas>
+      </div>
+      <div id="center-cards"></div>
+    </main>
+
+    <aside id="panel-right">
+      <button id="feed-reopen" class="hidden" title="Olay akışını aç">◀ #dünya-olayları</button>
+      <div class="feed-titlebar">
+        <span>#dünya-olayları</span>
+        <button id="btn-feed-toggle" title="Paneli daralt">▶</button>
+      </div>
+      <div id="feed-filters"></div>
+      <div id="news-feed"></div>
+      <div id="feed-status"></div>
+    </aside>
+  </div>
+
+  <footer id="instrument-bar">
+    <div id="instr-tabs"></div>
+    <div id="instr-list"></div>
+    <div id="instr-pager" class="instr-pager"></div>
+    <div id="pending-changes"></div>
+  </footer>
+
+  <!-- Mobil 9:16 kabuk: sekmeler soldan sağa kayar; desktop'ta gizli -->
+  <div id="mobile-chrome" class="hidden">
+    <header id="mobile-top" class="mobile-top">
+      <div class="m-top-line">
+        <span id="m-hdr-country" class="m-hdr-country">—</span>
+        <span id="m-hdr-date" class="m-hdr-date">—</span>
+      </div>
+      <div class="m-top-line m-top-actions">
+        <span id="m-hdr-polcap" title="Siyasi Sermaye">🏛 —</span>
+        <span id="m-hdr-slots">Müdahale —</span>
+        <button type="button" id="m-btn-help" class="btn btn-small">❓</button>
+        <button type="button" id="m-btn-music" class="btn btn-small" title="Ses: %40 — tıkla: %100">🔉 40%</button>
+        <button type="button" id="m-btn-log" class="btn btn-small">Günlük</button>
+        <button type="button" id="m-btn-commit" class="btn btn-primary btn-small">İlerle ▶</button>
+      </div>
+    </header>
+
+    <div id="mobile-track-wrap">
+      <div id="mobile-track">
+        <section class="m-page" data-page="0">
+          <div class="m-page-titlebar">📊 Durum</div>
+          <div class="m-page-body" id="m-host-status"></div>
+        </section>
+        <section class="m-page" data-page="1">
+          <div class="m-page-titlebar">📈 Grafik</div>
+          <div class="m-page-body" id="m-host-charts"></div>
+        </section>
+        <section class="m-page" data-page="2">
+          <div class="m-page-titlebar">💬 Olaylar</div>
+          <div class="m-page-body" id="m-host-feed"></div>
+        </section>
+        <section class="m-page" data-page="3">
+          <div class="m-page-titlebar">🗺 Harita</div>
+          <div class="m-page-body" id="m-host-map">
+            <p class="m-map-hint">Bir ülkeye dokunarak dünya haritasını aç. Sürükle / pinch zoom masaüstü harita modalında çalışır.</p>
+            <div id="m-map-chips" class="m-map-chips"></div>
+            <button type="button" id="m-btn-open-map" class="btn btn-primary" style="width:100%;margin-top:10px">Dünya Haritasını Aç</button>
+          </div>
+        </section>
+        <section class="m-page" data-page="4">
+          <div class="m-page-titlebar">⚙ Enstrümanlar</div>
+          <div class="m-page-body" id="m-host-instr"></div>
+        </section>
+      </div>
+    </div>
+
+    <nav id="mobile-bottom-nav" class="mobile-bottom-nav">
+      <button type="button" id="m-nav-prev" class="btn m-nav-btn" title="Önceki sekme">◀</button>
+      <div class="m-nav-center">
+        <div id="m-nav-label">Durum</div>
+        <div id="m-nav-dots" class="m-nav-dots"></div>
+      </div>
+      <button type="button" id="m-nav-next" class="btn m-nav-btn" title="Sonraki sekme">▶</button>
+    </nav>
+  </div>
+</div>
+
+<!-- ============ OYUN SONU ============ -->
+<div id="screen-end" class="screen">
+  <div class="end-box">
+    <h2>OYUN SONA ERDİ — SENİN MİRASIN</h2>
+    <div id="end-content"></div>
+    <div class="end-buttons">
+      <button id="btn-end-log" class="btn">Olay Günlüğünü İncele</button>
+      <button id="btn-end-menu" class="btn btn-primary">Ana Menüye Dön</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ZENGİN TOOLTIP ============ -->
+<div id="tooltip" class="hidden"></div>
+
+<!-- ============ MODALLAR ============ -->
+<div id="modal-backdrop" class="hidden">
+  <div id="modal-box">
+    <h3 id="modal-title"></h3>
+    <div id="modal-body"></div>
+    <div id="modal-buttons"></div>
+  </div>
+</div>
+
+<script src="js/data/countries.js"></script>
+<script src="js/data/instruments.js"></script>
+<script src="js/data/disasters.js"></script>
+<script src="js/core/state.js"></script>
+<script src="js/core/effects.js"></script>
+<script src="js/core/internal.js"></script>
+<script src="js/core/diplomacy.js"></script>
+<script src="js/core/news.js"></script>
+<script src="js/core/ai.js"></script>
+<script src="js/core/turn.js"></script>
+<script src="js/ui/charts.js"></script>
+<script src="js/ui/help.js"></script>
+<script src="js/ui/music.js"></script>
+<script src="js/ui/panels.js"></script>
+<script src="js/ui/screens.js"></script>
+<script src="js/ui/mobile.js"></script>
+<script src="js/ui/main.js"></script>
+</body>
+</html>

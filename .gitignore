@@ -1,0 +1,24 @@
+# --- Gizli / yerel (repoya girmez) ---
+YAPILACAKLAR.md
+*.pem
+*.ppk
+*.key
+id_rsa*
+*ssh-key*
+.env
+.env.*
+
+# OS / editör
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+.vscode/
+.idea/
+
+# Log / geçici
+*.log
+tmp/
+temp/
+~/
