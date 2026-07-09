@@ -9,11 +9,15 @@ GAME.showScreen = function (id) {
 /* ---- Ana menü ---- */
 GAME.renderMenu = function () {
   document.getElementById('btn-continue').disabled = !GAME.hasSave();
+  if (GAME.i18n && GAME.i18n.applyDom) GAME.i18n.applyDom();
+  const sw = document.getElementById('lang-switcher');
+  if (sw && GAME.i18n && GAME.i18n.renderLangSwitcher) GAME.i18n.renderLangSwitcher(sw);
   GAME.showScreen('screen-menu');
 };
 
 /* ---- Nasıl oynanır (detaylı + konu butonları) ---- */
 GAME.renderAbout = function () {
+  if (GAME.i18n && GAME.i18n.applyDom) GAME.i18n.applyDom();
   document.getElementById('about-content').innerHTML = GAME.ABOUT_MAIN_HTML || '';
   const topics = document.getElementById('about-topics');
   const body = document.getElementById('about-topic-body');
@@ -21,10 +25,10 @@ GAME.renderAbout = function () {
   if (topics) {
     topics.innerHTML = '';
     const items = [
-      ['instruments', '📚 Enstrümanlar'],
-      ['countries', '🌍 Ülkeler'],
-      ['charts', '📈 Grafikler'],
-      ['topics', '📖 Konular & Sistem']
+      ['instruments', GAME.t('ui.topic_instruments') || '📚 Instruments'],
+      ['countries', GAME.t('ui.topic_countries') || '🌍 Countries'],
+      ['charts', GAME.t('ui.topic_charts') || '📈 Charts'],
+      ['topics', GAME.t('ui.topic_system') || '📖 Topics & System']
     ];
     items.forEach(([id, label]) => {
       const b = document.createElement('button');
@@ -32,7 +36,7 @@ GAME.renderAbout = function () {
       b.textContent = label;
       b.onclick = () => {
         body.classList.remove('hidden');
-        body.innerHTML = GAME.HELP_TOPICS[id] || '<p>İçerik yok.</p>';
+        body.innerHTML = GAME.HELP_TOPICS[id] || ('<p>' + (GAME.t('ui.no_content') || 'No content.') + '</p>');
         body.scrollTop = 0;
       };
       topics.appendChild(b);
@@ -49,17 +53,20 @@ GAME.renderCountrySelect = function () {
     const def = GAME.COUNTRIES[cid];
     const card = document.createElement('div');
     card.className = 'country-card';
-    const diffCls = def.difficulty.includes('Zor') ? 'diff-zor' : def.difficulty.includes('Kolay') ? 'diff-kolay' : 'diff-orta';
+    const diffCls = GAME.difficultyClass ? GAME.difficultyClass(def.difficulty)
+      : (def.difficulty.includes('Zor') || /hard/i.test(def.difficulty) ? 'diff-zor'
+        : (def.difficulty.includes('Kolay') || /easy/i.test(def.difficulty) ? 'diff-kolay' : 'diff-orta'));
+    const L = (k, v) => (GAME.t ? GAME.t(k, v) : k);
     card.innerHTML =
       '<div class="flag">' + def.flag + '</div>' +
       '<h3>' + def.name + '</h3>' +
-      '<div class="diff ' + diffCls + '">Zorluk: ' + def.difficulty + '</div>' +
+      '<div class="diff ' + diffCls + '">' + L('ui.difficulty', { d: def.difficulty }) + '</div>' +
       '<div class="desc">' + def.desc + '</div>' +
       '<div class="stats">' +
-      '<span>Büyüme: <b>%' + def.ind.growth + '</b></span>' +
-      '<span>Enflasyon: <b>%' + def.ind.inflation + '</b></span>' +
-      '<span>Rezerv: <b>' + def.ind.reserves + ' mlr$</b></span>' +
-      '<span>Borç: <b>%' + def.ind.debt + '</b></span>' +
+      '<span>' + L('ui.stat_growth') + ': <b>%' + def.ind.growth + '</b></span>' +
+      '<span>' + L('ui.stat_inflation') + ': <b>%' + def.ind.inflation + '</b></span>' +
+      '<span>' + L('ui.stat_reserves') + ': <b>' + def.ind.reserves + ' mlr$</b></span>' +
+      '<span>' + L('ui.stat_debt') + ': <b>%' + def.ind.debt + '</b></span>' +
       '</div>' +
       '<div style="margin-top:8px;font-size:11px;color:#000080">▸ ' + def.style + '</div>';
     card.onclick = () => {
@@ -93,9 +100,9 @@ GAME.startGameScreen = function () {
   // Açılış mesajları (ilk turda)
   if (GAME.state.turn === 1 && GAME.state.news.length === 0) {
     GAME.pushNews({
-      cat: 'global', tone: 3, source: '🌍 Küresel',
-      title: 'Dünya ekonomisi istikrarlı görünüyor',
-      body: '2026 yılı sakin başladı. Ancak uzmanlar küresel tedarik zincirlerinin ve finansal sistemin aşırı kırılgan olduğunu belirtiyor. Bu sükûnet ne kadar sürer?',
+      cat: 'global', tone: 3, source: GAME.t('ui.global_source'),
+      title: GAME.t('ui.intro_title') || 'Dünya ekonomisi istikrarlı görünüyor',
+      body: GAME.t('ui.intro_body') || '2026 yılı sakin başladı. Ancak uzmanlar küresel tedarik zincirlerinin ve finansal sistemin aşırı kırılgan olduğunu belirtiyor. Bu sükûnet ne kadar sürer?',
       involves: [], important: true
     });
     GAME.pushNews({
@@ -667,9 +674,10 @@ GAME.showEndScreen = function () {
   const box = document.getElementById('end-content');
   const def = GAME.pdef();
 
+  const t = (k, v) => (GAME.t ? GAME.t(k, v) : k);
   let legacyHtml = scores.playerLegacy.length ?
     scores.playerLegacy.map(l => '<div class="legacy-item">[' + GAME.turnDate(l.turn) + '] ' + l.text + '</div>').join('') :
-    '<div style="color:#505050">Kalıcı yapısal değişim yaratmadın. Dünya, felaket öncesi düzenine geri dönüyor…</div>';
+    '<div style="color:#505050">' + t('ui.legacy_none_long') + '</div>';
 
   // Küresel kalıcı değişimler (diğer aktörlerinki dahil)
   const worldLegacy = s.legacy.filter(l => l.cid !== s.player).slice(0, 8)
@@ -679,24 +687,22 @@ GAME.showEndScreen = function () {
 
   box.innerHTML =
     '<p style="text-align:center;color:#505050">' + def.flag + ' ' + def.name + ' — ' + GAME.turnDate(1) + ' → ' + GAME.turnDate(s.turn) + '</p>' +
-    (dis ? '<p style="text-align:center">Yaşanan felaket: <b>' + dis.icon + ' ' + dis.name + '</b> (' + GAME.turnDate(s.disaster.startTurn) + ')</p>' : '') +
-    '<h3>🏛 Senin Mirasın (Kalıcı Yapısal Değişimler)</h3>' + legacyHtml +
-    (worldLegacy ? '<h3>🌍 Dünyada Başkalarının Bıraktığı İzler</h3>' + worldLegacy : '') +
-    '<h3>📊 Performans Değerlendirmesi</h3>' +
+    (dis ? '<p style="text-align:center">' + t('ui.lived_disaster') + '<b>' + dis.icon + ' ' + dis.name + '</b> (' + GAME.turnDate(s.disaster.startTurn) + ')</p>' : '') +
+    '<h3>' + t('ui.end_h_legacy') + '</h3>' + legacyHtml +
+    (worldLegacy ? '<h3>' + t('ui.end_h_world') + '</h3>' + worldLegacy : '') +
+    '<h3>' + t('ui.end_h_scores') + '</h3>' +
     '<table>' +
-    '<tr><td>Kendi Ülke Performansı</td><td>' + scores.perf + '/100</td></tr>' +
-    '<tr><td>Küresel İstikrar Katkısı</td><td>' + scores.global + '/100</td></tr>' +
-    '<tr><td>Miras Gücü</td><td>' + scores.legacy + '/100</td></tr>' +
-    '<tr><td>Stratejik Tutarlılık (Proje: ' + scores.projectStats.completed + '/' + scores.projectStats.started + ' tamamlandı)</td><td>' + scores.consistency + '/100</td></tr>' +
-    '<tr><td>Risk Yönetimi (Tespit edilen operasyon: ' + s.detectedOps + ')</td><td>' + scores.risk + '/100</td></tr>' +
+    '<tr><td>' + t('ui.score_perf') + '</td><td>' + scores.perf + '/100</td></tr>' +
+    '<tr><td>' + t('ui.score_global') + '</td><td>' + scores.global + '/100</td></tr>' +
+    '<tr><td>' + t('ui.score_legacy') + '</td><td>' + scores.legacy + '/100</td></tr>' +
+    '<tr><td>' + t('ui.score_consistency', { done: scores.projectStats.completed, started: scores.projectStats.started }) + '</td><td>' + scores.consistency + '/100</td></tr>' +
+    '<tr><td>' + t('ui.score_risk', { n: s.detectedOps }) + '</td><td>' + scores.risk + '/100</td></tr>' +
     '</table>' +
-    '<h3>💭 Kişisel Yansıma</h3>' +
-    '<p class="reflect">· En çok pişman olduğun müdahale hangisiydi?<br>' +
-    '· En gurur duyduğun kararın neydi?<br>' +
-    '· Bu felakete karşı en iyi strateji ne olurdu?<br>' +
-    '· Farklı bir yol seçseydin, dünya bugün nasıl olurdu?</p>' +
-    '<p style="text-align:center;margin-top:14px;color:#806000"><b>Toplam ' + s.interventionLog.length + ' müdahale yaptın. Dünya artık senin de izini taşıyor.</b></p>';
+    '<h3>' + t('ui.end_h_reflect') + '</h3>' +
+    '<p class="reflect">' + t('ui.end_reflect_html') + '</p>' +
+    '<p style="text-align:center;margin-top:14px;color:#806000"><b>' + t('ui.end_total_acts', { n: s.interventionLog.length }) + '</b></p>';
 
+  if (GAME.i18n && GAME.i18n.applyDom) GAME.i18n.applyDom();
   document.getElementById('btn-end-log').onclick = GAME.openLogModal;
   document.getElementById('btn-end-menu').onclick = () => { GAME.clearSave(); GAME.renderMenu(); };
   GAME.showScreen('screen-end');

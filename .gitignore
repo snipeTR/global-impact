@@ -22,3 +22,7 @@ desktop.ini
 tmp/
 temp/
 ~/
+
+# i18n extract cache
+lang/_extract/
+

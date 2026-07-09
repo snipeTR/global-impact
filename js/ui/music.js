@@ -179,9 +179,10 @@ GAME.Music.buttonLabel = function () {
 
 GAME.Music.buttonTitle = function () {
   const v = GAME.Music.volume;
-  if (v <= 0.001) return 'Ses: kapalı — tıkla: %40';
-  if (v <= 0.5) return 'Ses: %40 — tıkla: %100';
-  return 'Ses: %100 — tıkla: sessiz';
+  const t = (k) => (GAME.t ? GAME.t(k) : k);
+  if (v <= 0.001) return t('ui.music_title_0');
+  if (v <= 0.5) return t('ui.music_title_40');
+  return t('ui.music_title_100');
 };
 
 GAME.Music.updateButtons = function () {

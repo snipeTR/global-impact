@@ -176,7 +176,8 @@ GAME.renderChartControls = function () {
     b.onclick = () => { GAME.chart.indicator = sr.id; GAME.renderChartControls(); GAME.drawChart(); };
     indBox.appendChild(b);
   });
-  [['1y', '1 Yıl'], ['3y', '3 Yıl'], ['5y', '5 Yıl'], ['10y', '10 Yıl'], ['all', 'Tümü']].forEach(([id, label]) => {
+  [['1y', 'ui.range_1y'], ['3y', 'ui.range_3y'], ['5y', 'ui.range_5y'], ['10y', 'ui.range_10y'], ['all', 'ui.range_all']].forEach(([id, labelKey]) => {
+    const label = GAME.t ? GAME.t(labelKey) : labelKey;
     const b = document.createElement('button');
     b.className = 'chip' + (GAME.chart.range === id ? ' active' : '');
     b.textContent = label;

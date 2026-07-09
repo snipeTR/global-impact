@@ -199,3 +199,22 @@ Konsolda: `GAME.countNewsTemplates()`, `GAME.testInstrumentPaging()`.
 5. Kayıt anahtarlarına `_oyungrok` soneki zorunlu (çakışma olmasın).
 6. Tur script modelini basitleştirip “sadece AIIndex”e geri alma — kullanıcı v2’yi istedi.
 7. Biten işleri YAPILACAKLAR açık listesinden çıkar; yeni kalıcı kuralı buraya yaz.
+
+---
+
+## 11. Çoklu dil (i18n) — koru
+
+```
+lang/
+  i18n.js           # çekirdek: register, t, setLang, applyAll
+  tr/pack.js        # Türkçe (varsayılan / kaynak)
+  en/pack.js        # İngilizce
+```
+
+- **localStorage:** `keLang_oyungrok` (dil tercihi).
+- **API:** `GAME.t('ui.new_game')`, `GAME.i18n.setLang('en')`, `GAME.aiMsg(key, vars)`.
+- **Paket bölümleri:** `ui`, `instruments`, `countries`, `disasters`, `layers`, `groups`, `globals`, `indMeta`, `toneMeta`, `newsCats`, `diplo`, `econTitle`, `econBody`, `globalTitle`, `globalBody`, `risk`, `events`, `projectDone`, `projectProg`, `detection*`, `disasterFlavor`, `help`, `about`, `chartSeries`, `ai`, `gov`.
+- **gov kodları çevrilmez** (`demokratik` / `otoriter` / `hibrit` / `birlik`) — görünen etiket `GAME.govLabel(gov)`.
+- Yeni dil eklemek: `lang/<kod>/pack.js` yaz → `GAME.i18n.supported` listesine ekle → `index.html` script tag.
+- Yeni UI metni: `data-i18n` veya `GAME.t('ui.…')` + her dil paketinde anahtar.
+- `tools/build-lang-tr.js` / `tools/build-lang-en.js` paket üretici yardımcılarıdır (zorunlu runtime değil).

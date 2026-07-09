@@ -17,7 +17,10 @@ GAME.renderHeader = function () {
   document.getElementById('hdr-date').textContent = GAME.turnDate(s.turn) + '  (Tur ' + s.turn + '/' + GAME.MAX_TURNS + ')';
   document.getElementById('hdr-polcap').innerHTML = '🏛 <b>' + Math.round(GAME.pc().internal.polCap) + '</b>';
   const used = s.pending.length;
-  document.getElementById('hdr-slots').innerHTML = 'Müdahale: <b>' + (GAME.SLOTS_PER_TURN - used) + '/' + GAME.SLOTS_PER_TURN + '</b>';
+  const slotsLeft = GAME.SLOTS_PER_TURN - used;
+  document.getElementById('hdr-slots').innerHTML = GAME.t
+    ? GAME.t('ui.slots_html', { used: slotsLeft, max: GAME.SLOTS_PER_TURN })
+    : ('Müdahale: <b>' + slotsLeft + '/' + GAME.SLOTS_PER_TURN + '</b>');
 
   // Ülke çipleri: bayrak + kısa ad; ayrılan alana kaydırmasız sığar
   const map = document.getElementById('hdr-map');

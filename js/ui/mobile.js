@@ -6,6 +6,7 @@ GAME.mobile = {
   active: false,
   page: 0,
   titles: ['Durum', 'Grafik', 'Olaylar', 'Harita', 'Enstrüman'],
+  titleKeys: ['ui.nav_status', 'ui.nav_chart', 'ui.nav_feed', 'ui.nav_map', 'ui.nav_instr'],
   /* { elId, hostId, homeParentId, homeBeforeId } */
   moves: [
     { el: 'panel-left', host: 'm-host-status', home: 'game-body', before: 'panel-center' },
@@ -115,7 +116,12 @@ GAME.buildMobileNav = function () {
     dots.appendChild(d);
   });
   const label = document.getElementById('m-nav-label');
-  if (label) label.textContent = GAME.mobile.titles[GAME.mobile.page];
+  if (label) {
+    const keys = GAME.mobile.titleKeys;
+    label.textContent = (keys && GAME.t)
+      ? GAME.t(keys[GAME.mobile.page])
+      : GAME.mobile.titles[GAME.mobile.page];
+  }
 };
 
 GAME.goMobilePage = function (i, smooth) {
@@ -129,7 +135,12 @@ GAME.goMobilePage = function (i, smooth) {
     if (page) page.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', inline: 'start', block: 'nearest' });
   }
   const label = document.getElementById('m-nav-label');
-  if (label) label.textContent = GAME.mobile.titles[GAME.mobile.page];
+  if (label) {
+    const keys = GAME.mobile.titleKeys;
+    label.textContent = (keys && GAME.t)
+      ? GAME.t(keys[GAME.mobile.page])
+      : GAME.mobile.titles[GAME.mobile.page];
+  }
   document.querySelectorAll('#m-nav-dots .m-dot').forEach((d, idx) => {
     d.classList.toggle('active', idx === GAME.mobile.page);
   });
@@ -157,7 +168,10 @@ GAME.syncMobileChrome = function () {
   set('m-hdr-date', GAME.turnDate(s.turn) + ' · T' + s.turn + '/' + GAME.MAX_TURNS);
   set('m-hdr-polcap', '🏛 <b>' + Math.round(GAME.pc().internal.polCap) + '</b>');
   const used = s.pending.length;
-  set('m-hdr-slots', 'Müdahale <b>' + (GAME.SLOTS_PER_TURN - used) + '/' + GAME.SLOTS_PER_TURN + '</b>');
+  const left = GAME.SLOTS_PER_TURN - used;
+  set('m-hdr-slots', GAME.t
+    ? GAME.t('ui.slots_html', { used: left, max: GAME.SLOTS_PER_TURN })
+    : ('Müdahale <b>' + left + '/' + GAME.SLOTS_PER_TURN + '</b>'));
   GAME.renderMobileMapChips();
 };
 

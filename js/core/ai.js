@@ -48,6 +48,18 @@ GAME.aiPlan = function (cid) {
     if (d.max !== undefined && val > d.max) val = d.max;
     cands.push({ score, insId, val, target, title, body, tone, important, why });
   };
+  /** i18n AI mesajı — key + vars → title/body/why */
+  const M = (key, extra) => {
+    const vars = Object.assign({ name: def.name }, extra || {});
+    if (vars.targetCid && GAME.COUNTRIES[vars.targetCid]) {
+      vars.target = GAME.COUNTRIES[vars.targetCid].name;
+    }
+    if (vars.pnameCid && GAME.COUNTRIES[vars.pnameCid]) {
+      vars.pname = GAME.COUNTRIES[vars.pnameCid].name;
+    }
+    if (typeof GAME.aiMsg === 'function') return GAME.aiMsg(key, vars);
+    return { title: key, body: '', why: '' };
+  };
 
   const inflGap = ind.inflation - base.inflation;
   const growthGap = ind.growth - base.growth;
@@ -67,164 +79,158 @@ GAME.aiPlan = function (cid) {
   // Enflasyon → faiz artışı
   if (inflGap > 2.5 && rate < 55) {
     const hike = GAME.clamp(Math.round(inflGap / 3), 1, 5);
+    const m = M('rate_hike', { from: GAME.fmt(rate, 1), to: GAME.fmt(rate + hike, 1), infl: GAME.fmt(ind.inflation, 1), gap: GAME.fmt(inflGap, 1) });
     add(inflGap * 1.1 + Math.max(0, curGap) * 0.15 - Math.max(0, -growthGap - 2),
-      'policy_rate', Math.min(58, rate + hike), null,
-      def.name + " faizi %" + GAME.fmt(rate, 1) + "'den %" + GAME.fmt(rate + hike, 1) + "'e çıkardı",
-      'Merkez bankası artan enflasyona sıkılaştırmayla yanıt verdi.', null, false,
-      'Enflasyon %' + GAME.fmt(ind.inflation, 1) + ' — tabanın ' + GAME.fmt(inflGap, 1) + ' puan üzerinde. Faiz artışı enflasyonu ve kur baskısını düşürür.');
+      'policy_rate', Math.min(58, rate + hike), null, m.title, m.body, null, false, m.why);
   }
   // Yüksek enflasyon + QE açıksa QE'yi kıs
   if (inflGap > 3 && qe > 0) {
-    add(inflGap * 0.8, 'qe', Math.max(0, qe - 2), null,
-      def.name + ' miktarsal gevşemeyi yavaşlattı', 'Enflasyon baskısı nedeniyle bilanço genişlemesi frenlendi.', null, false,
-      'QE enflasyonu besliyor. Likidite musluğunu kısmak fiyat istikrarı için gerekli.');
+    const m = M('qe_slow');
+    add(inflGap * 0.8, 'qe', Math.max(0, qe - 2), null, m.title, m.body, null, false, m.why);
   }
   // Fiyat kontrolleri: hiperenflasyon / kriz istikrarı
   if (inflGap > 8 && stab < 55 && ins.price_controls.val < 50) {
-    add(inflGap * 0.35 + (50 - stab) * 0.08, 'price_controls', Math.min(80, ins.price_controls.val + 40), null,
-      def.name + ' temel mallarda fiyat tavanı getirdi', 'Toplumsal öfkeyi bastırmak için acil fiyat kontrolü.', null, false,
-      'Enflasyon %' + GAME.fmt(ind.inflation, 1) + ' ve istikrar kırılgan. Kısa vadede enflasyonu ve öfkeyi bastırır; orta vadede kıtlık riski.');
+    const m = M('price_cap', { infl: GAME.fmt(ind.inflation, 1) });
+    add(inflGap * 0.35 + (50 - stab) * 0.08, 'price_controls', Math.min(80, ins.price_controls.val + 40), null, m.title, m.body, null, false, m.why);
   }
   // Gevşeme: enflasyon sakinken
   if (inflGap < 1 && growthGap < -1 && rate > baseRate - 0.5) {
-    add(-growthGap * 1.1 + 0.5, 'policy_rate', Math.max(0.5, rate - 1.5), null,
-      def.name + ' faiz indirimine gitti', 'Zayıflayan ekonomiyi desteklemek için para politikası gevşetildi.', null, false,
-      'Enflasyon kontrol altında ama büyüme zayıf. Faiz indirimi krediyi ucuzlatır.');
+    const m = M('rate_cut');
+    add(-growthGap * 1.1 + 0.5, 'policy_rate', Math.max(0.5, rate - 1.5), null, m.title, m.body, null, false, m.why);
   }
   // Resesyonda QE (gelişmiş / düşük enflasyon)
   if (growthGap < -1.5 && inflGap < 2 && ind.debt > 80 && qe < 12 && p.patience > 0.35) {
-    add(-growthGap * 0.7, 'qe', Math.min(15, qe + 3), null,
-      def.name + ' miktarsal gevşeme programı başlattı', 'Merkez bankası varlık alımlarıyla likidite enjekte ediyor.', null, false,
-      'Klasik faiz alanının daraldığı ortamda QE büyümeyi destekler; enflasyon ve kur riski taşır.');
+    const m = M('qe_start');
+    add(-growthGap * 0.7, 'qe', Math.min(15, qe + 3), null, m.title, m.body, null, false, m.why);
   }
   // Maliye teşvik
   if (growthGap < -1.2 && ind.debt < 150) {
+    const m = M('stimulus');
     add(-growthGap * 1.0 + (unempGap > 1 ? 0.8 : 0) - (ind.debt > 110 ? 1 : 0),
-      'public_spending', Math.min(18, ps + 2), null,
-      def.name + ' teşvik paketi açıkladı', 'Kamu harcamaları daralan ekonomiye karşı artırılıyor.', null, false,
-      'Büyüme zayıf. Kamu harcaması istihdamı destekler; bedeli borç.');
+      'public_spending', Math.min(18, ps + 2), null, m.title, m.body, null, false, m.why);
   }
   // Vergi indirimi (resesyon, borç makul)
   if (growthGap < -1.5 && ind.debt < 100 && tax > baseTax - 5) {
-    add(-growthGap * 0.55, 'tax_rate', Math.max(10, tax - 2), null,
-      def.name + ' vergi indirimine gitti', 'Özel sektörü canlandırmak için vergi yükü hafifletildi.', null, false,
-      'Vergi indirimi talebi ve yatırımı destekler; bütçe açığı riski artar.');
+    const m = M('tax_cut');
+    add(-growthGap * 0.55, 'tax_rate', Math.max(10, tax - 2), null, m.title, m.body, null, false, m.why);
   }
   // Kemer sıkma
   if (ind.debt > 160 && ps > 3) {
-    add((ind.debt - 160) * 0.06 + 1, 'public_spending', ps - 2, null,
-      def.name + ' kemer sıkmaya geçti', 'Yükselen borç yükü nedeniyle kamu harcamaları kısılıyor.', null, false,
-      'Borç %' + GAME.fmt(ind.debt, 0) + ' GDP. Harcama kısmak borç dinamiğini frenler.');
+    const m = M('austerity');
+    add((ind.debt - 160) * 0.06 + 1, 'public_spending', ps - 2, null, m.title, m.body, null, false, m.why);
   }
   if (ind.debt > 170 && tax < 45) {
-    add((ind.debt - 170) * 0.05 + 0.8, 'tax_rate', Math.min(48, tax + 2), null,
-      def.name + ' mali konsolidasyon için vergi artırdı', 'Borç sürdürülebilirliği için gelirler güçlendiriliyor.', null, false,
-      'Yüksek borçta vergi artışı bütçeyi onarır; büyüme ve onay bedeli vardır.');
+    const m = M('tax_hike');
+    add((ind.debt - 170) * 0.05 + 0.8, 'tax_rate', Math.min(48, tax + 2), null, m.title, m.body, null, false, m.why);
   }
   // Kur savunması
   if (curGap > 8 && resRatio > 0.5) {
-    add(curGap * 0.7, 'fx_intervention', Math.min(120, ins.fx_intervention.val + 25), null,
-      def.name + ' döviz piyasasına müdahale etti', 'Merkez bankası rezerv satarak kuru savunuyor.', null, false,
-      'Para birimi %' + GAME.fmt(curGap, 1) + ' değer kaybetti. Müdahale kuru toparlar, rezerv eritir.');
+    const m = M('fx_defend');
+    add(curGap * 0.7, 'fx_intervention', Math.min(120, ins.fx_intervention.val + 25), null, m.title, m.body, null, false, m.why);
   }
   if (curGap > 12 && ins.capital_controls.val < 70) {
+    const m = M('capital_ctrl');
     add(curGap * 0.45 + (1 - p.diplomacy) * 1.5, 'capital_controls',
-      Math.min(100, ins.capital_controls.val + 30), null,
-      def.name + ' sermaye kontrollerini sıkılaştırdı', 'Sıcak para çıkışına karşı yeni tedbirler devrede.', null, false,
-      'Kur kaybı derin. Sermaye kontrolü çıkışı frenler; yatırım yavaşlar.');
+      Math.min(100, ins.capital_controls.val + 30), null, m.title, m.body, null, false, m.why);
   }
   if (curGap > 10 && def.gov === 'otoriter' && ins.shadow_fx.val === 0) {
-    add(curGap * 0.35 * p.opportunism, 'shadow_fx', 1, null, null, null, null, false,
-      'Gölge müdahale resmi istatistiklere yansımadan kuru destekler — tespit riski taşır.');
+    const m = M('shadow_fx');
+    add(curGap * 0.35 * p.opportunism, 'shadow_fx', 1, null, m.title, m.body, null, false, m.why);
   }
   // Jawboning: ucuz kur/algı desteği
   if (curGap > 5 && curGap < 15 && ins.jawboning.val < 60) {
-    add(curGap * 0.25 + 0.5, 'jawboning', Math.min(80, ins.jawboning.val + 30), null,
-      def.name + ' piyasalara güvence mesajı verdi', 'Üst düzey açıklamalarla kur ve risk algısı yönetiliyor.', null, false,
-      'Ucuz ve hızlı: jawboning kısa ömürlü kur desteği sağlar.');
+    const m = M('jawbone');
+    add(curGap * 0.25 + 0.5, 'jawboning', Math.min(80, ins.jawboning.val + 30), null, m.title, m.body, null, false, m.why);
   }
   // Rezerv koruması
   if (resRatio < 0.35) {
-    if (ins.fx_intervention.val > 0) add(4, 'fx_intervention', 0, null,
-      def.name + ' kur savunmasını durdurdu', 'Rezervlerin erimesi üzerine döviz müdahalesine son verildi.', null, false,
-      'Rezervler kritik. Savunmayı sürdürmek rezervi tüketir.');
-    if (ins.shadow_fx.val > 0) add(3.5, 'shadow_fx', 0, null, null, null, null, false,
-      'Gölge döviz müdahalesi rezerv yakıyor. Kapat.');
-    if (rate < 40) add(2.5, 'policy_rate', Math.min(58, rate + 2), null,
-      def.name + ' rezerv kaybını frenlemek için faiz artırdı', null, null, false,
-      'Yüksek getiri sermaye çıkışını yavaşlatır.');
+    if (ins.fx_intervention.val > 0) {
+      const m = M('fx_stop');
+      add(4, 'fx_intervention', 0, null, m.title, m.body, null, false, m.why);
+    }
+    if (ins.shadow_fx.val > 0) {
+      const m = M('fx_stop');
+      add(3.5, 'shadow_fx', 0, null, m.title, m.body, null, false, m.why);
+    }
+    if (rate < 40) {
+      const m = M('rate_reserve');
+      add(2.5, 'policy_rate', Math.min(58, rate + 2), null, m.title, m.body, null, false, m.why);
+    }
   }
   // İstihdam
   if (unempGap > 1.2) {
-    add(unempGap * 0.7, 'subsidy', Math.min(100, ins.subsidy.val + 25), null,
-      def.name + ' istihdam için sübvansiyonları artırdı', null, null, false,
-      'İşsizlik yüksek. Sübvansiyon istihdamı destekler; bütçe yükü artar.');
-    if (ins.export_credit.val < 50 && ind.trade < 30)
-      add(unempGap * 0.4, 'export_credit', Math.min(80, ins.export_credit.val + 30), null,
-        def.name + ' ihracat kredi paketini genişletti', 'Exim tipi desteklerle dış talep çekiliyor.', null, false,
-        'İhracat kredisi ticaret dengesini ve büyümeyi destekler.');
+    const m = M('subsidy_jobs');
+    add(unempGap * 0.7, 'subsidy', Math.min(100, ins.subsidy.val + 25), null, m.title, m.body, null, false, m.why);
+    if (ins.export_credit.val < 50 && ind.trade < 30) {
+      const m2 = M('export_credit');
+      add(unempGap * 0.4, 'export_credit', Math.min(80, ins.export_credit.val + 30), null, m2.title, m2.body, null, false, m2.why);
+    }
   }
   // İstikrar
   if (stab < 45) {
-    add((50 - stab) * 0.1, 'strategic_stock', 80, null,
-      def.name + ' stratejik stokları güçlendirdi', 'Toplumsal gerilime karşı gıda ve enerji güvenliği önlemleri.', null, false,
-      'Yüksek stok gıda fiyatlarını sakinleştirir.');
-    add((48 - stab) * 0.09, 'subsidy', Math.min(100, ins.subsidy.val + 20), null, null, null, null, false,
-      'Sübvansiyon kısa vadeli rahatlama sağlar.');
+    const m = M('stocks');
+    add((50 - stab) * 0.1, 'strategic_stock', 80, null, m.title, m.body, null, false, m.why);
+    const m2 = M('subsidy_jobs');
+    add((48 - stab) * 0.09, 'subsidy', Math.min(100, ins.subsidy.val + 20), null, m2.title, m2.body, null, false, m2.why);
   }
   // Ulusal şampiyon: ihracatçı / iş dünyası baskısı, sakin dönem
   if (growthGap > -1 && ind.trade > 20 && ins.national_champion.val === 0 && p.patience > 0.4 && Math.random() < 0.08) {
-    add(1.4, 'national_champion', 1, null,
-      def.name + ' ulusal şampiyon birleşmelerine yeşil ışık yaktı', 'Yerli devlerin küresel rekabeti hedefleniyor.', null, false,
-      'Ölçek ekonomisi ve ihracat gücü artar; enflasyon ve tekel riski vardır.');
+    const m = M('national_champ');
+    add(1.4, 'national_champion', 1, null, m.title, m.body, null, false, m.why);
   }
   // Ar-Ge politikası
   if (growthGap > -1 && stab > 50 && ins.rd_policy.val < 40 && p.patience > 0.55 && Math.random() < 0.1) {
-    add(1.2 + p.patience, 'rd_policy', 55, null,
-      def.name + ' stratejik Ar-Ge programını güçlendirdi', 'Uzun vadeli verimlilik ve teknoloji kapasitesi hedefleniyor.', null, false,
-      'Ar-Ge yatırımı yavaş ama kalıcı büyüme üretir.');
+    const m = M('project_start', { ins: GAME.INSTRUMENTS_BY_ID.rd_policy.name });
+    add(1.2 + p.patience, 'rd_policy', 55, null, m.title, m.body, null, false, m.why);
   }
 
   /* ===== 2. FELAKETE ÖZEL SAVUNMA ===== */
   const dis = s.disaster ? GAME.DISASTERS.find(d => d.id === s.disaster.id) : null;
   if (dis) {
-    if (['food_crisis', 'volcano', 'suez'].indexOf(dis.id) >= 0 && ins.strategic_stock.val < 70)
-      add(3, 'strategic_stock', 85, null, def.name + ' kriz stoklarını "Yüksek" seviyeye çekti', null, null, false,
-        '"' + dis.name + '" arz zincirlerini vuruyor. Stok felakette 1.4× etkili.');
-    if (['china_quake', 'tsunami', 'supernova'].indexOf(dis.id) >= 0 && ins.subsidy.val < 60)
-      add(2.2, 'subsidy', Math.min(100, ins.subsidy.val + 30), null,
-        def.name + ' sanayiye kriz desteği açıkladı', null, null, false,
-        'Üretim zincirleri sarsılıyor. Sübvansiyon işsizlik dalgasını hafifletir.');
+    if (['food_crisis', 'volcano', 'suez'].indexOf(dis.id) >= 0 && ins.strategic_stock.val < 70) {
+      const m = M('stocks');
+      add(3, 'strategic_stock', 85, null, m.title, m.body, null, false, m.why);
+    }
+    if (['china_quake', 'tsunami', 'supernova'].indexOf(dis.id) >= 0 && ins.subsidy.val < 60) {
+      const m = M('crisis_industry');
+      add(2.2, 'subsidy', Math.min(100, ins.subsidy.val + 30), null, m.title, m.body, null, false, m.why);
+    }
     if (dis.id === 'oil_depletion') {
-      if (ps < 12) add(2.4, 'public_spending', ps + 2, null,
-        def.name + ' enerji dönüşümü için harcamaları artırdı', null, null, false,
-        'Petrol şoku kalıcı. Kamu yatırımı dönüşümü hızlandırır.');
-      // Enerji ihracatçısı fırsatçılığı
+      if (ps < 12) {
+        const m = M('energy_spend');
+        add(2.4, 'public_spending', ps + 2, null, m.title, m.body, null, false, m.why);
+      }
       if (def.deps.oil < -0.3 && ins.energy_weapon.val === 0 && p.opportunism > 0.5) {
         const foes = Object.keys(s.countries).filter(o => o !== cid && GAME.getRelation(cid, o) < -40 && (GAME.COUNTRIES[o].deps.oil || 0) > 0.3);
-        if (foes.length) add(2.0 + p.opportunism, 'energy_weapon', 1, GAME.pick(foes),
-          def.name + ' enerji ihracatını silahlaştırdı', 'Petrol/gaz kısıtı ile jeopolitik baskı.', 5, true,
-          'Enerji kartı kriz döneminde en güçlü koz. Küresel petrol fiyatını da fırlatır.');
+        if (foes.length) {
+          const t = GAME.pick(foes);
+          const m = M('energy_weapon', { targetCid: t });
+          add(2.0 + p.opportunism, 'energy_weapon', 1, t, m.title, m.body, 5, true, m.why);
+        }
       }
     }
     if (dis.id === 'food_crisis' && def.deps.food < -0.3 && ins.food_weapon.val === 0 && p.opportunism > 0.45) {
       const foes = Object.keys(s.countries).filter(o => o !== cid && GAME.getRelation(cid, o) < -30);
-      if (foes.length) add(1.8 + p.opportunism, 'food_weapon', 1, GAME.pick(foes),
-        def.name + ' gıda ihracatını kısıtladı', 'Küresel gıda krizinde arz silahı devrede.', 5, true,
-        'Gıda ihracatçısı avantajı: hedefte enflasyon ve istikrarsızlık.');
+      if (foes.length) {
+        const t = GAME.pick(foes);
+        const m = M('food_weapon', { targetCid: t });
+        add(1.8 + p.opportunism, 'food_weapon', 1, t, m.title, m.body, 5, true, m.why);
+      }
     }
     if (dis.id === 'brics_currency' && cid !== 'USA' && ['CHN', 'RUS', 'IND', 'BRA', 'ZAF', 'SAU'].indexOf(cid) >= 0) {
-      if (ins.alt_finance.val === 0 && p.patience > 0.5)
-        add(2.5, 'alt_finance', 1, null, def.name + ' alternatif ödeme altyapısını hızlandırdı', null, null, false,
-          'Dolar sarsılırken SWIFT alternatifi stratejik fırsat.');
-      if (ins.cbdc.val === 0 && cid === 'CHN')
-        add(2.2, 'cbdc', 1, null, def.name + ' CBDC sınır ötesi pilotunu genişletti', null, null, false,
-          'BRICS para şoku CBDC ile birleşince dolarsızlaşma hızlanır.');
+      if (ins.alt_finance.val === 0 && p.patience > 0.5) {
+        const m = M('alt_finance');
+        add(2.5, 'alt_finance', 1, null, m.title, m.body, null, false, m.why);
+      }
+      if (ins.cbdc.val === 0 && cid === 'CHN') {
+        const m = M('cbdc');
+        add(2.2, 'cbdc', 1, null, m.title, m.body, null, false, m.why);
+      }
     }
-    if (dis.id === 'suez' && ins.infra_corridor.val === 0 && p.patience > 0.5)
-      add(2.0, 'infra_corridor', 1, null,
-        def.name + ' alternatif koridor projesini başlattı', 'Süveyş tıkanıklığına karşı lojistik diversifikasyon.', null, false,
-        'Altyapı kuşağı navlun şokunda kalıcı avantaj yaratır.');
+    if (dis.id === 'suez' && ins.infra_corridor.val === 0 && p.patience > 0.5) {
+      const m = M('corridor');
+      add(2.0, 'infra_corridor', 1, null, m.title, m.body, null, false, m.why);
+    }
   }
 
   /* ===== 3. DİPLOMATİK / TİCARİ HAMLELER ===== */
@@ -235,10 +241,8 @@ GAME.aiPlan = function (cid) {
       const t = GAME.pick(friends);
       const tCur = 100 - s.countries[t].ind.currency;
       if (tCur > 5 || s.countries[t].ind.reserves < GAME.COUNTRIES[t].ind.reserves * 0.7) {
-        add(1.6 + p.diplomacy, 'currency_swap', 1, t,
-          def.name + ', ' + GAME.COUNTRIES[t].name + ' ile döviz swap hattı açtı',
-          'Karşılıklı likidite desteği; ilişki ve piyasa güveni güçlenir.', 2, t === s.player,
-          'Swap hattı müttefike rezerv/güven aşılarken senin nüfuzunu da artırır.');
+        const m = M('swap', { targetCid: t });
+        add(1.6 + p.diplomacy, 'currency_swap', 1, t, m.title, m.body, 2, t === s.player, m.why);
       }
     }
   }
@@ -247,16 +251,14 @@ GAME.aiPlan = function (cid) {
       GAME.getRelation(cid, o) > 20 && s.countries[o].internal.stability < 50);
     if (needy.length && ins.aid_diplomacy.val === 0) {
       const t = GAME.pick(needy);
-      add(1.3 + p.diplomacy * 0.5, 'aid_diplomacy', 1, t,
-        def.name + ', ' + GAME.COUNTRIES[t].name + "'e kalkınma yardımı paketi açıkladı",
-        'Yumuşak güç diplomasisi: yardım karşılığında nüfuz.', 2, t === s.player);
+      const m = M('aid', { targetCid: t });
+      add(1.3 + p.diplomacy * 0.5, 'aid_diplomacy', 1, t, m.title, m.body, 2, t === s.player, m.why);
     }
   }
   // İhracat kredisi (ihracat odaklı)
   if (ind.trade > 30 && growthGap < 0 && ins.export_credit.val < 45) {
-    add(1.1 + Math.max(0, -growthGap) * 0.3, 'export_credit', 55, null,
-      def.name + ' ihracat finansmanını güçlendirdi', null, null, false,
-      'Exim desteği ticaret fazlasını ve büyümeyi besler.');
+    const m = M('export_fin');
+    add(1.1 + Math.max(0, -growthGap) * 0.3, 'export_credit', 55, null, m.title, m.body, null, false, m.why);
   }
 
   /* ===== 4. OYUNCU / DIŞ EYLEMLERE TEPKİ ===== */
@@ -268,40 +270,38 @@ GAME.aiPlan = function (cid) {
       if (iv.target === cid && sev > 0 && iv.val > 0) {
         const rel = GAME.getRelation(cid, s.player);
         const bs = sev * 1.4 + p.aggression * 3 + (rel < -100 ? 1.5 : 0);
-        if (sev >= 3 && p.aggression > 0.5 && ins.secondary_sanctions.val === 0)
-          add(bs + 1, 'secondary_sanctions', 1, s.player,
-            def.name + ', ' + pname + "'e misilleme yaptırımları başlattı",
-            '"' + iv.name + '" kararına yanıt: karşı yaptırım paketi.', 5, true);
-        else if (ins.tariff && ins.tariff.val < 40)
-          add(bs * 0.9, 'tariff', Math.min(100, (ins.tariff.val || 0) + 50), s.player,
-            def.name + ', ' + pname + ' mallarına gümrük duvarı ördü',
-            '"' + iv.name + '" hamlesine tarife yanıtı.', 4, true);
-        else if (ins.anti_dumping.val === 0)
-          add(bs, 'anti_dumping', 1, s.player,
-            def.name + ', ' + pname + ' mallarına misilleme vergisi koydu',
-            '"' + iv.name + '" hamlesine ticari yanıt.', 4, true);
-        if (sev >= 4 && def.gov === 'otoriter' && ins.asset_freeze.val === 0)
-          add(bs + 1.5, 'asset_freeze', 1, s.player,
-            def.name + ', ' + pname + ' varlıklarını dondurdu',
-            'Karşılıklı varlık dondurma dönemi.', 5, true);
-        // Enerji kartı misilleme
-        if (sev >= 2 && def.deps.oil < -0.4 && ins.energy_weapon.val === 0 && p.aggression > 0.5)
-          add(bs + 0.5, 'energy_weapon', 1, s.player,
-            def.name + ' enerji musluğunu ' + pname + "'e karşı kıstı",
-            'Misilleme: enerji silahı devrede.', 5, true);
+        if (sev >= 3 && p.aggression > 0.5 && ins.secondary_sanctions.val === 0) {
+          const m = M('tariff_ret', { pname: pname });
+          add(bs + 1, 'secondary_sanctions', 1, s.player, m.title, m.body, 5, true, m.why);
+        } else if (ins.tariff && ins.tariff.val < 40) {
+          const m = M('tariff_wall', { pname: pname });
+          add(bs * 0.9, 'tariff', Math.min(100, (ins.tariff.val || 0) + 50), s.player, m.title, m.body, 4, true, m.why);
+        } else if (ins.anti_dumping.val === 0) {
+          const m = M('tariff_ret', { pname: pname });
+          add(bs, 'anti_dumping', 1, s.player, m.title, m.body, 4, true, m.why);
+        }
+        if (sev >= 4 && def.gov === 'otoriter' && ins.asset_freeze.val === 0) {
+          const m = M('freeze', { pname: pname });
+          add(bs + 1.5, 'asset_freeze', 1, s.player, m.title, m.body, 5, true, m.why);
+        }
+        if (sev >= 2 && def.deps.oil < -0.4 && ins.energy_weapon.val === 0 && p.aggression > 0.5) {
+          const m = M('energy_vs', { pname: pname });
+          add(bs + 0.5, 'energy_weapon', 1, s.player, m.title, m.body, 5, true, m.why);
+        }
       }
       if ((iv.insId === 'chokepoint' || iv.insId === 'food_weapon' || iv.insId === 'energy_weapon') &&
-          iv.val > 0 && iv.target !== cid && ins.strategic_stock.val < 60)
-        add(1.8 + p.patience, 'strategic_stock', 75, null,
-          def.name + ' arz şokuna karşı stok artırdı',
-          pname + "'in arz kısıtlamaları sonrası tedarik güvenliği.", 4);
+          iv.val > 0 && iv.target !== cid && ins.strategic_stock.val < 60) {
+        const m = M('stock_shock', { pname: pname });
+        add(1.8 + p.patience, 'strategic_stock', 75, null, m.title, m.body, 4, false, m.why);
+      }
       if ((iv.insId === 'subsidy' || iv.insId === 'export_credit') && iv.val >= 55 && ind.trade > 40) {
-        if (ins.anti_dumping.val === 0)
-          add(1.2 + p.aggression * 1.5, 'anti_dumping', 1, s.player,
-            def.name + ', ' + pname + ' sübvansiyonlarına anti-damping ile yanıt verdi', null, 4, true);
-        else if (ins.tariff.val < 40)
-          add(1.1 + p.aggression, 'tariff', 55, s.player,
-            def.name + ', ' + pname + ' mallarına dengeleyici tarife koydu', null, 4, true);
+        if (ins.anti_dumping.val === 0) {
+          const m = M('tariff_ret', { pname: pname });
+          add(1.2 + p.aggression * 1.5, 'anti_dumping', 1, s.player, m.title, m.body, 4, true, m.why);
+        } else if (ins.tariff.val < 40) {
+          const m = M('tariff_balance', { pname: pname });
+          add(1.1 + p.aggression, 'tariff', 55, s.player, m.title, m.body, 4, true, m.why);
+        }
       }
       // Yardım / swap → olumlu not (AI nadiren taklit eder)
       if ((iv.insId === 'aid_diplomacy' || iv.insId === 'currency_swap') && iv.target === cid && iv.val > 0) {
@@ -323,10 +323,8 @@ GAME.aiPlan = function (cid) {
       const pj = prefs[0];
       const d = GAME.INSTRUMENTS_BY_ID[pj];
       const openVal = d.type === 'slider' ? 50 : 1;
-      add(1.5 + p.patience * 1.5, pj, openVal, null,
-        def.name + (d.project ? ' dev stratejik proje başlattı: ' : ' stratejik program açtı: ') + d.name,
-        'Uzun vadeli yapısal hamle; etkileri yıllar içinde hissedilecek.', 3, false,
-        '"' + d.name + '" ülke profiline uygun uzun vadeli hamle.');
+      const m = M('project_start', { ins: d.name });
+      add(1.5 + p.patience * 1.5, pj, openVal, null, m.title, m.body, 3, false, m.why);
     }
   }
 
@@ -335,18 +333,16 @@ GAME.aiPlan = function (cid) {
     const enemies = Object.keys(s.countries).filter(o => o !== cid && GAME.getRelation(cid, o) < -110);
     if (enemies.length) {
       const t = GAME.pick(enemies);
-      if (ins.secondary_sanctions.val === 0)
-        add(1 + p.aggression * 2, 'secondary_sanctions', 1, t,
-          def.name + ', ' + GAME.COUNTRIES[t].name + "'e ikincil yaptırımları devreye aldı",
-          'Gerginlik tırmanıyor.', t === s.player ? 5 : 4, t === s.player,
-          'Düşmanca ilişkide yaptırım rakibi zayıflatır; ticaret bedeli vardır.');
-      else if (def.deps.oil < -0.4 && ins.energy_weapon.val === 0)
-        add(1.2 + p.aggression, 'energy_weapon', 1, t,
-          def.name + ' enerji silahını ' + GAME.COUNTRIES[t].name + "'e çevirdi", null,
-          t === s.player ? 5 : 4, t === s.player);
-      else if (ins.chokepoint.val === 0 && c.ind.influence > 55)
-        add(1 + p.aggression, 'chokepoint', 1, t,
-          def.name + ' kritik tedarikte kota uyguladı', null, t === s.player ? 5 : 4, t === s.player);
+      if (ins.secondary_sanctions.val === 0) {
+        const m = M('tariff_ret', { pname: GAME.COUNTRIES[t].name, targetCid: t });
+        add(1 + p.aggression * 2, 'secondary_sanctions', 1, t, m.title, m.body, t === s.player ? 5 : 4, t === s.player, m.why);
+      } else if (def.deps.oil < -0.4 && ins.energy_weapon.val === 0) {
+        const m = M('energy_target', { targetCid: t });
+        add(1.2 + p.aggression, 'energy_weapon', 1, t, m.title, m.body, t === s.player ? 5 : 4, t === s.player, m.why);
+      } else if (ins.chokepoint.val === 0 && c.ind.influence > 55) {
+        const m = M('chokepoint', { targetCid: t });
+        add(1 + p.aggression, 'chokepoint', 1, t, m.title, m.body, t === s.player ? 5 : 4, t === s.player, m.why);
+      }
     }
   }
   if (p.opportunism > 0.6 && def.gov === 'otoriter' && Math.random() < 0.06) {

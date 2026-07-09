@@ -6,16 +6,19 @@ GAME.sleep = ms => new Promise(r => setTimeout(r, ms));
 /* Bekleyen enstrüman özeti metni */
 GAME.formatPendingSummary = function () {
   const s = GAME.state;
+  const t = (k, v) => (GAME.t ? GAME.t(k, v) : k);
   if (!s || !s.pending || !s.pending.length) {
-    return '<p style="color:#505050">Bu turda <b>hiç enstrüman değişikliği</b> seçilmedi. Mevcut politikalar sürdürülerek tur ilerleyecek.</p>';
+    return '<p style="color:#505050">' + t('ui.pending_none_html') + '</p>';
   }
-  let html = '<p><b>' + s.pending.length + ' müdahale</b> onay bekliyor:</p><ol class="commit-summary-list">';
+  let html = '<p><b>' + s.pending.length + '</b> ' + t('ui.pending_waiting') + '</p><ol class="commit-summary-list">';
   s.pending.forEach(p => {
     const ins = GAME.INSTRUMENTS_BY_ID[p.insId];
     if (!ins) return;
     let act;
-    if (ins.type === 'toggle') act = p.val > 0 ? '<b style="color:#008000">AÇ</b>' : '<b style="color:#c00000">KAPAT</b>';
-    else if (ins.type === 'slider') act = 'Seviye <b>' + Math.round(p.val) + '</b>';
+    if (ins.type === 'toggle') act = p.val > 0
+      ? '<b style="color:#008000">' + t('ui.open') + '</b>'
+      : '<b style="color:#c00000">' + t('ui.close') + '</b>';
+    else if (ins.type === 'slider') act = t('ui.level', { v: Math.round(p.val) });
     else act = '<b>' + GAME.fmt(p.val, 1) + (ins.unit || '') + '</b>';
     if (p.target && GAME.COUNTRIES[p.target]) {
       act += ' → ' + GAME.COUNTRIES[p.target].flag + ' ' + GAME.COUNTRIES[p.target].name;
@@ -26,8 +29,8 @@ GAME.formatPendingSummary = function () {
   });
   html += '</ol>';
   const cap = s.pending.reduce((a, p) => a + ((GAME.INSTRUMENTS_BY_ID[p.insId] || {}).cost || 8), 0);
-  html += '<p style="margin-top:8px;font-size:12px;color:#505050">Toplam siyasi sermaye maliyeti: <b>🏛 ' + cap + '</b> · ' +
-    'Mevcut: <b>' + Math.round(GAME.pc().internal.polCap) + '</b></p>';
+  html += '<p style="margin-top:8px;font-size:12px;color:#505050">' +
+    t('ui.total_polcap_cost', { cap: cap, pc: Math.round(GAME.pc().internal.polCap) }) + '</p>';
   return html;
 };
 
@@ -36,18 +39,19 @@ GAME.confirmCommitTurn = function () {
   if (GAME.ui.processing || !GAME.state || GAME.state.gameOver) return;
   document.getElementById('modal-box').classList.remove('map-mode', 'map-mode-mobile');
   document.getElementById('modal-backdrop').classList.remove('map-backdrop-mobile');
-  document.getElementById('modal-title').textContent = '▶ Turu Onayla — ' + GAME.turnDate(GAME.state.turn);
+  document.getElementById('modal-title').textContent =
+    GAME.t('ui.turn_confirm_title', { date: GAME.turnDate(GAME.state.turn) });
   document.getElementById('modal-body').innerHTML =
     '<div class="commit-confirm">' +
     GAME.formatPendingSummary() +
-    '<p style="margin-top:12px"><b>Bu müdahalelerle turu ilerletmek istediğine emin misin?</b></p>' +
-    '<p style="font-size:11px;color:#505050">Onaydan sonra kararlar uygulanır, diğer ülkeler tepki verir ve simülasyon işler. Geri alınamaz.</p>' +
+    '<p style="margin-top:12px"><b>' + GAME.t('ui.turn_confirm_sure') + '</b></p>' +
+    '<p style="font-size:11px;color:#505050">' + GAME.t('ui.turn_confirm_note') + '</p>' +
     '</div>';
   const btns = document.getElementById('modal-buttons');
   btns.innerHTML = '';
   const yes = document.createElement('button');
   yes.className = 'btn btn-primary';
-  yes.textContent = 'Evet, ilerle';
+  yes.textContent = GAME.t('ui.yes_advance');
   yes.onclick = () => {
     GAME.closeModal();
     // Mobilde dünya olayları (Olaylar) sekmesine geç
@@ -58,7 +62,7 @@ GAME.confirmCommitTurn = function () {
   };
   const no = document.createElement('button');
   no.className = 'btn';
-  no.textContent = 'Vazgeç';
+  no.textContent = GAME.t('ui.cancel');
   no.onclick = GAME.closeModal;
   btns.appendChild(yes);
   btns.appendChild(no);
@@ -78,7 +82,7 @@ GAME.runTurnAnimated = async function (resumeJob) {
   GAME.ui.helpConsent = false;
   GAME.ui.helpCache = null;
   const commitBtns = [document.getElementById('btn-commit'), document.getElementById('m-btn-commit')].filter(Boolean);
-  commitBtns.forEach(btn => { btn.disabled = true; btn.textContent = 'Tur...'; });
+  commitBtns.forEach(btn => { btn.disabled = true; btn.textContent = GAME.t('ui.commit_busy'); });
 
   let job = resumeJob || null;
 
@@ -158,7 +162,7 @@ GAME.runTurnAnimated = async function (resumeJob) {
   GAME.ui.processing = false;
   commitBtns.forEach(btn => {
     btn.disabled = false;
-    btn.textContent = btn.id === 'm-btn-commit' ? 'İlerle ▶' : 'Onayla ve İlerle ▶';
+    btn.textContent = btn.id === 'm-btn-commit' ? GAME.t('ui.commit_short') : GAME.t('ui.commit');
   });
 
   if (result.disasterTriggered) {
@@ -197,12 +201,15 @@ GAME.tryResumeTurnJob = function () {
 };
 
 document.addEventListener('DOMContentLoaded', function () {
+  /* i18n: dil paketleri yüklü → baseline + kayıtlı dil uygula */
+  if (GAME.i18n && GAME.i18n.init) GAME.i18n.init();
+
   if (GAME.Music && GAME.Music.bindUnlockOnce) GAME.Music.bindUnlockOnce();
   if (GAME.Music && GAME.Music.bindButtons) GAME.Music.bindButtons();
 
   /* Menü butonları */
   document.getElementById('btn-new-game').onclick = () => {
-    if (GAME.hasSave() && !confirm('Kayıtlı oyun silinecek. Yeni oyuna başlamak istediğine emin misin?')) return;
+    if (GAME.hasSave() && !confirm(GAME.t('ui.confirm_new'))) return;
     GAME.clearSave();
     GAME.renderCountrySelect();
   };
@@ -222,6 +229,21 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('btn-log').onclick = GAME.openLogModal;
   document.getElementById('btn-commit').onclick = GAME.confirmCommitTurn;
   document.getElementById('btn-help').onclick = GAME.openHelpModal;
+
+  /* Dil değiştir (oyun içi 🌐) */
+  const cycleLang = () => {
+    if (!GAME.i18n) return;
+    const list = GAME.i18n.supported || [];
+    if (!list.length) return;
+    const cur = GAME.i18n.getLang();
+    const idx = list.findIndex(L => L.code === cur);
+    const next = list[(idx + 1) % list.length];
+    GAME.i18n.setLang(next.code);
+  };
+  const btnLang = document.getElementById('btn-lang-game');
+  if (btnLang) btnLang.onclick = cycleLang;
+  const mBtnLang = document.getElementById('m-btn-lang');
+  if (mBtnLang) mBtnLang.onclick = cycleLang;
 
   /* mIRC paneli aç/kapa */
   document.getElementById('btn-feed-toggle').onclick = () => GAME.toggleFeed(true);

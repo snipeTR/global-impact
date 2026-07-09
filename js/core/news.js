@@ -1,7 +1,8 @@
 /* ============ KÜRESEL ETKİ — Mesaj ve Haber Üretim Sistemi ============ */
 window.GAME = window.GAME || {};
 
-/* Mesaj kategorileri: eko | diplo | global | ic | proje | risk | ai | felaket */
+/* Mesaj kategorileri: eko | diplo | global | ic | proje | risk | ai | felaket
+   Metinler lang paketlerinden uygulanır (i18n.applyDataStrings). */
 GAME.NEWS_CATS = {
   eko:    'Ekonomik Haberler',
   diplo:  'Diplomatik Mesajlar',
@@ -10,6 +11,15 @@ GAME.NEWS_CATS = {
   gri:    'Casusluk / Gri Alan',
   benim:  'Beni Etkileyenler'
 };
+
+/* Küresel endeks haber gövdeleri — i18n globalBody ile ezilir */
+GAME.GLOBAL_BODY = [
+  'Tedarik zincirleri yeniden fiyatlanıyor.',
+  'İthalatçı ve ihracatçı ülkeler asimetrik etkileniyor.',
+  'Merkez bankaları ve bakanlıklar brifing üstüne brifing veriyor.',
+  'Vadeli piyasalar volatilite primi istiyor.',
+  'Jeopolitik risk primi fiyatlara yansıyor.'
+];
 
 /* Mesaj ekle */
 GAME.pushNews = function (msg) {
@@ -235,7 +245,7 @@ GAME.generateEconNews = function (out) {
       cat: 'global', tone: 0, source: '🌍 Küresel',
       title: GAME.pick(GAME.GLOBAL_TITLE[dir]).replace(/\{name\}/g, nm),
       body: nm + ': ' + GAME.fmt(prev, 0) + ' → ' + GAME.fmt(cur, 0) + ' (' + (d > 0 ? '+' : '') + GAME.fmt(d, 0) + '). ' +
-        GAME.pick([
+        GAME.pick(GAME.GLOBAL_BODY || [
           'Tedarik zincirleri yeniden fiyatlanıyor.',
           'İthalatçı ve ihracatçı ülkeler asimetrik etkileniyor.',
           'Merkez bankaları ve bakanlıklar brifing üstüne brifing veriyor.',

@@ -11,6 +11,7 @@ Büyük bir küresel felaket sonrası seçtiğin ülkeyi **yalnızca ekonomik en
 | **Platform** | Masaüstü tarayıcı + mobil dikey (9:16 sekmeli arayüz) |
 | **Süre** | 60 tur ≈ 15 yıl (1 tur = 3 ay / 1 çeyrek) |
 | **İçerik** | 17 ülke · 48 enstrüman · 10 felaket · AI rakip ülkeler |
+| **Diller** | Türkçe + English (`lang/` modüler paketler) |
 | **Repo** | [github.com/snipeTR/kuresel-etki](https://github.com/snipeTR/kuresel-etki) |
 
 ---
@@ -31,6 +32,12 @@ Açık todo şablonu: **[YAPILACAKLAR.example.md](YAPILACAKLAR.example.md)**
 # 1. Basit kullanıcılar
 
 Bu bölüm **hiç kod bilmeden** oynamak içindir.
+
+## 1.0 Dil seçimi
+
+- Ana menüde **Türkçe / English** butonları.
+- Oyun içinde üst barda **🌐** ile dil değiştirilir.
+- Seçim tarayıcıda hatırlanır.
 
 ## 1.1 Oyunu nasıl açarım?
 
@@ -270,12 +277,26 @@ node serve.js
 
 `serve.js` yalnızca statik dosya sunar. `index.html` dosya protokolüyle de açılabilir; müzik / CORS için HTTP tercih edilir.
 
-## 2.3 Proje ağacı
+## 2.3 Çoklu dil (`lang/`)
+
+| Dosya | Rol |
+|-------|-----|
+| `lang/i18n.js` | `GAME.t`, `setLang`, `applyAll`, dil seçici |
+| `lang/tr/pack.js` | Türkçe paket (varsayılan) |
+| `lang/en/pack.js` | İngilizce paket |
+
+- Ana menüde dil butonları; oyun içinde 🌐 ile döngü.
+- Tercih: `localStorage` → `keLang_oyungrok`.
+- Yeni dil: `lang/<kod>/pack.js` + `GAME.i18n.supported` + `index.html` script.
+- Ayrıntı: [AGENTS.md §11](AGENTS.md).
+
+## 2.4 Proje ağacı
 
 ```text
 kuresel-etki/
 ├── index.html              # Tüm ekranlar + #mobile-chrome kabuğu
 ├── css/style.css           # Win95 tema + body.mobile-ui
+├── lang/                   # i18n çekirdek + tr/ + en/
 ├── assets/world-map.svg    # ISO path’li dünya haritası
 ├── music/                  # normal, felaket, diplomasi, savas
 ├── js/
@@ -307,7 +328,7 @@ kuresel-etki/
 └── README.md               # Bu dosya
 ```
 
-## 2.4 Mimari kararlar
+## 2.5 Mimari kararlar
 
 | Konu | Karar | Neden |
 |------|--------|--------|
