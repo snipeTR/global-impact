@@ -418,7 +418,7 @@ GAME.applyAIScriptEntry = function (entry) {
     if (act.title) {
       GAME.pushNews({
         cat: act.cat || 'eko', tone: act.tone || 3,
-        source: def.flag + ' ' + def.name,
+        source: GAME.countrySource ? GAME.countrySource(cid) : def.name,
         title: act.title, body: act.body || '',
         involves: [cid, act.target].filter(Boolean),
         important: !!act.important
@@ -439,7 +439,7 @@ GAME.runAICountry = function (cid) {
     // Aynı turda çift haber olmasın diye yalnızca senkron yolda bas
     GAME.pushNews({
       cat: act.cat || 'eko', tone: act.tone || 3,
-      source: def.flag + ' ' + def.name,
+      source: GAME.countrySource ? GAME.countrySource(cid) : def.name,
       title: act.title, body: act.body || '',
       involves: [cid, act.target].filter(Boolean),
       important: !!act.important

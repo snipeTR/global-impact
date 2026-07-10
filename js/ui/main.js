@@ -22,7 +22,9 @@ GAME.formatPendingSummary = function () {
     else if (ins.type === 'slider') act = t('ui.level', { v: Math.round(p.val) });
     else act = '<b>' + GAME.fmt(p.val, 1) + (ins.unit || '') + '</b>';
     if (p.target && GAME.COUNTRIES[p.target]) {
-      act += ' → ' + GAME.COUNTRIES[p.target].flag + ' ' + GAME.COUNTRIES[p.target].name;
+      act += ' → ' + (GAME.flagLabelHtml
+        ? GAME.flagLabelHtml(p.target, GAME.COUNTRIES[p.target].name, { size: 'sm' })
+        : GAME.countryText(p.target));
     }
     const layer = GAME.LAYERS[ins.layer] ? GAME.LAYERS[ins.layer].short : '';
     html += '<li><span class="commit-layer">[' + layer + ']</span> <b>' + ins.name + '</b>: ' + act +
@@ -149,7 +151,7 @@ GAME.runTurnAnimated = async function (resumeJob) {
     const cid = entry.cid;
     const def = GAME.COUNTRIES[cid];
     if (def) {
-      GAME.setFeedStatus('*** ' + def.flag + ' ' + def.name +
+      GAME.setFeedStatus('*** ' + (GAME.countryText ? GAME.countryText(cid) : def.name) +
         (entry.actions && entry.actions.length ? ' işlem yapıyor' : ' geçiyor'));
     }
     const before = GAME.state.news.length;

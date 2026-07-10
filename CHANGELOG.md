@@ -13,6 +13,18 @@ _(Boş — sıradaki iş buraya)_
 
 ---
 
+## 2026-07-10 — Finalize: bugfix + agent/test senkron
+
+- Haber `source` / tur status: emoji bayrak yok → `countryText` / `countrySource` (Windows harf çifti yok).
+- HTML UI: pending/hedef/tavsiye bayrakları `flagLabelHtml`.
+- `clearSave` → `GAME.state = null` (menü yan etkisi).
+- Danışma maliyeti `instrumentCost` (escalate doğru).
+- Olay günlüğü modal i18n + escape.
+- `test-consistency.js`: flags, glossary, tunables, music yükler.
+- AGENTS §8 bayrak/metin kuralı.
+
+---
+
 ## 2026-07-10 — Müzik: ayar %40 iken yeni oyunda çalmama
 
 - `unlock()` bitince `pause()` yeni oyunun `playFile` ile yarışıyordu → buton %40, ses yok.

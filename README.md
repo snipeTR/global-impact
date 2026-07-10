@@ -391,9 +391,11 @@ Sırayı bozma: `tunables` data’dan sonra; `main` en sonda; `mobile` panellere
 | `kureselEtkiTurnJob_oyungrok` | Yarım tur AI script (`complete: false`) |
 | `keFeedCollapsed_oyungrok` | Sağ feed daraltma tercihi |
 | `keLang_oyungrok` | Dil (`tr` / `en`) |
-| `keSettings_oyungrok` | Ayarlar paneli |
+| `keSettings_oyungrok` | Ayarlar (`volStep`, `chatSpeed`, …) |
 | `keTunables_oyungrok` | Gelişmiş ayarlar (sabitler) |
 | `keGlossSkip_oyungrok` | Sözlük “bir daha gösterme” |
+
+Bayrak API: `GAME.flagHtml` / `flagLabelHtml` (UI), `GAME.countryText` / `countrySource` (haber metni).
 
 Eski sürüm `kureselEtkiSave` kullanır — **karıştırma**.
 

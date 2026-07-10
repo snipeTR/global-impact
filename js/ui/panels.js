@@ -111,7 +111,11 @@ GAME.renderLeftPanel = function () {
     let html = '<div class="policy-item"><span class="p-type">' + typeLabel + '</span>' +
       '<span class="p-name">' + ins.name + '</span>' +
       '<div class="p-meta">' + stateTxt +
-      (st.target ? ' → ' + GAME.COUNTRIES[st.target].flag + ' ' + GAME.COUNTRIES[st.target].name : '') + '</div>';
+      (st.target
+        ? ' → ' + (GAME.flagLabelHtml
+          ? GAME.flagLabelHtml(st.target, GAME.COUNTRIES[st.target].name, { size: 'sm' })
+          : GAME.countryText(st.target))
+        : '') + '</div>';
     if (ins.project && st.progress !== null && st.progress !== undefined && st.progress < 100) {
       html += '<div class="progress-bar"><div class="progress-fill" style="width:' + st.progress + '%"></div></div>' +
         '<div class="p-meta">Proje: %' + Math.round(st.progress) + '</div>';
@@ -871,10 +875,17 @@ GAME.buildAdvice = function () {
       let act;
       if (d.type === 'toggle') act = cd.val > 0 ? '<b style="color:#008000">AÇ</b>' : '<b style="color:#c00000">KAPAT</b>';
       else act = '<b>' + GAME.fmt(st.val, 1) + (d.unit || '') + ' → ' + GAME.fmt(cd.val, 1) + (d.unit || '') + '</b>';
-      if (cd.target) act += ' · Hedef: <b>' + GAME.COUNTRIES[cd.target].flag + ' ' + GAME.COUNTRIES[cd.target].name + '</b>';
+      if (cd.target) {
+        act += ' · Hedef: <b>' + (GAME.flagLabelHtml
+          ? GAME.flagLabelHtml(cd.target, GAME.COUNTRIES[cd.target].name, { size: 'sm' })
+          : GAME.countryText(cd.target)) + '</b>';
+      }
+      const adviceCost = GAME.instrumentCost
+        ? GAME.instrumentCost(s.player, cd.insId)
+        : (d.cost || 8);
       html += '<div class="advice-item">' +
         '<div class="a-head">' + (i + 1) + '. <span class="a-layer">[' + GAME.LAYERS[d.layer].name + ']</span> ' +
-        '<b>' + d.name + '</b> <span class="a-cost">🏛 ' + (d.cost || 8) + '</span></div>' +
+        '<b>' + d.name + '</b> <span class="a-cost">🏛 ' + adviceCost + '</span></div>' +
         '<div class="a-act">Önerilen: ' + act + '</div>' +
         '<div class="a-why">' + cd.why + '</div>' +
         '</div>';
@@ -950,16 +961,20 @@ GAME.openHelpModal = function () {
 /* ================= OLAY GÜNLÜĞÜ MODALI ================= */
 GAME.openLogModal = function () {
   const s = GAME.state;
-  document.getElementById('modal-title').textContent = 'Olay Günlüğü (' + s.news.length + ' kayıt)';
+  const t = (k, v) => (GAME.t ? GAME.t(k, v) : k);
+  document.getElementById('modal-title').textContent =
+    t('ui.log') + ' (' + s.news.length + ')';
   const body = document.getElementById('modal-body');
   body.innerHTML = '';
   s.news.slice().reverse().slice(0, 200).forEach(m => {
-    body.innerHTML += '<div class="log-item">[' + m.date + '] <b>' + (m.source || '') + '</b> — ' + m.title + '</div>';
+    const src = GAME.escapeHtml ? GAME.escapeHtml(m.source || '') : (m.source || '');
+    const title = GAME.escapeHtml ? GAME.escapeHtml(m.title || '') : (m.title || '');
+    body.innerHTML += '<div class="log-item">[' + (m.date || '') + '] <b>' + src + '</b> — ' + title + '</div>';
   });
   const btns = document.getElementById('modal-buttons');
   btns.innerHTML = '';
   const b = document.createElement('button');
-  b.className = 'btn btn-primary'; b.textContent = 'Kapat'; b.onclick = GAME.closeModal;
+  b.className = 'btn btn-primary'; b.textContent = t('ui.close_modal'); b.onclick = GAME.closeModal;
   btns.appendChild(b);
   document.getElementById('modal-backdrop').classList.remove('hidden');
 };

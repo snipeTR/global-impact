@@ -185,11 +185,11 @@ GAME.generateReactions = function (actorCid, ins, target, out) {
     const titles = [
       GAME.COUNTRIES[obs].name + ' — ' + ins.name + ' hakkında',
       GAME.COUNTRIES[obs].name + ' dışişleri: ' + ins.name,
-      GAME.COUNTRIES[obs].flag + ' resmi tepki: ' + ins.name,
+      (GAME.countryText ? GAME.countryText(obs) : GAME.COUNTRIES[obs].name) + ' resmi tepki: ' + ins.name,
       GAME.COUNTRIES[obs].name + ' basına brifing verdi'
     ];
     out.push(GAME.pushNews({
-      cat: 'diplo', tone: tone, source: GAME.COUNTRIES[obs].flag + ' ' + GAME.COUNTRIES[obs].name,
+      cat: 'diplo', tone: tone, source: GAME.countrySource ? GAME.countrySource(obs) : GAME.COUNTRIES[obs].name,
       title: GAME.pick(titles),
       body: tmpl,
       effect: (obs === target) ? ('İlişki: ' + GAME.sign(Math.round(ins.onTarget && ins.onTarget.rel || -10)) + ' puan') : null,
@@ -317,7 +317,7 @@ GAME.generateEventNews = function (events, out) {
     const cn = GAME.COUNTRIES[e.cid];
     out.push(GAME.pushNews({
       cat: 'ic', tone: e.ev === 'hukumet_degisti' ? 5 : 4,
-      source: cn.flag + ' ' + cn.name,
+      source: GAME.countrySource ? GAME.countrySource(e.cid) : cn.name,
       title: cn.name + ': ' + txt.t, body: txt.b,
       involves: [e.cid], important: e.cid === s.player
     }));
@@ -342,7 +342,7 @@ GAME.generateProjectNews = function (projEvents, out) {
     const cn = GAME.COUNTRIES[p.cid];
     out.push(GAME.pushNews({
       cat: p.done ? 'global' : 'eko', tone: p.done ? 2 : 0,
-      source: cn.flag + ' ' + cn.name,
+      source: GAME.countrySource ? GAME.countrySource(p.cid) : cn.name,
       title: p.done
         ? GAME.pick([
           cn.name + ': "' + p.insName + '" TAMAMLANDI',
@@ -379,7 +379,9 @@ GAME.generateDetectionNews = function (actorCid, ins, target, out) {
   const fill = (s) => s.replace(/\{an\}/g, an.name).replace(/\{ins\}/g, ins.name).replace(/\{by\}/g, by);
   out.push(GAME.pushNews({
     cat: 'gri', tone: 5,
-    source: tn ? (tn.flag + ' ' + tn.name) : '🌍 Küresel',
+    source: tn
+      ? (GAME.countrySource ? GAME.countrySource(target) : tn.name)
+      : (GAME.t ? GAME.t('ui.global_source') : '🌍 Küresel'),
     title: fill(GAME.pick(GAME.DETECTION_TITLES)),
     body: fill(GAME.pick(GAME.DETECTION_BODIES)),
     effect: 'İlişkiler çöktü, misilleme başlıyor',

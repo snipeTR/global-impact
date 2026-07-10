@@ -72,3 +72,21 @@ GAME.flagLabelHtml = function (cidOrDef, text, opts) {
   const esc = GAME.escapeHtml ? GAME.escapeHtml(label) : String(label);
   return GAME.flagHtml(cidOrDef, opts) + ' <span class="flag-label-text">' + esc + '</span>';
 };
+
+/**
+ * Düz metin ülke adı (emoji yok — Windows feed/status’ta CA/BR harfi olmasın).
+ * Haber source, setFeedStatus, plain logs.
+ */
+GAME.countryText = function (cidOrDef) {
+  if (!cidOrDef) return '';
+  if (typeof cidOrDef === 'string') {
+    const d = GAME.COUNTRIES && GAME.COUNTRIES[cidOrDef];
+    return d ? d.name : cidOrDef;
+  }
+  return cidOrDef.name || cidOrDef.id || '';
+};
+
+/** Haber / diplomasi source satırı (yalnız ad) */
+GAME.countrySource = function (cidOrDef) {
+  return GAME.countryText(cidOrDef);
+};

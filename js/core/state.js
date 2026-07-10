@@ -187,6 +187,8 @@ GAME.hasSave = function () { return !!localStorage.getItem(GAME.SAVE_KEY); };
 GAME.clearSave = function () {
   localStorage.removeItem(GAME.SAVE_KEY);
   GAME.clearTurnJob();
+  /* Yeni oyun akışında eski state menüde müzik/unlock yan etkisine yol açmasın */
+  GAME.state = null;
 };
 
 /* ---- Tur işi (script + preAiState; complete:false iken oynatma baştan) ----

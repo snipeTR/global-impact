@@ -154,6 +154,7 @@ API: `recordAICountry`, `applyAIScriptEntry`, `buildAIScript`, `cloneState`.
 - 3 panel + alt enstrüman bar; orta panelde **scroll yok** → grafik sıkışır; min ~140px’te scroll.
 - Harita: pan/zoom (mouse + touch), ilişki **renkli çizgiler** (relationColor), efsane yan panelde.
 - mIRC sağ panel; daraltılabilir.
+- **Bayraklar:** UI HTML’de `GAME.flagHtml` / `flagLabelHtml` + `assets/flags/*.png` (Win95 çerçeve). Haber `source` / status düz metin: `GAME.countryText` / `countrySource` (emoji yok — Windows CA/BR harfi).
 
 ### Mobil (`body.mobile-ui`, genişlik ≤920 veya dikey dar)
 | # | Sekme |

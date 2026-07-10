@@ -22,10 +22,11 @@ ctx.requestAnimationFrame = (fn) => { try { fn(); } catch (e) {} };
 ctx.localStorage = { _d: {}, getItem(k){return this._d[k]||null;}, setItem(k,v){this._d[k]=v;}, removeItem(k){delete this._d[k];} };
 
 const files = [
-  'js/data/countries.js', 'js/data/instruments.js', 'js/data/disasters.js',
-  'js/core/state.js', 'js/core/effects.js', 'js/core/internal.js', 'js/core/diplomacy.js',
+  'js/data/countries.js', 'js/data/flags.js', 'js/data/instruments.js', 'js/data/disasters.js',
+  'js/data/glossary.js',
+  'js/core/state.js', 'js/core/tunables.js', 'js/core/effects.js', 'js/core/internal.js', 'js/core/diplomacy.js',
   'js/core/news.js', 'js/core/ai.js', 'js/core/turn.js',
-  'js/ui/charts.js', 'js/ui/help.js', 'js/ui/panels.js', 'js/ui/screens.js', 'js/ui/mobile.js', 'js/ui/main.js'
+  'js/ui/charts.js', 'js/ui/help.js', 'js/ui/music.js', 'js/ui/panels.js', 'js/ui/screens.js', 'js/ui/mobile.js', 'js/ui/main.js'
 ];
 for (const f of files) {
   const code = fs.readFileSync(path.join(root, f), 'utf8');
