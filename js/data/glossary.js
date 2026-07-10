@@ -427,6 +427,80 @@ GAME.plainExplainLine = function (raw) {
 
 GAME._glossaryPopEl = null;
 GAME._glossaryPopMeta = null;
+GAME._feedLineTipEl = null;
+
+/** Masaüstü mü? (mobile-ui yok) — satır ipucu yalnızca desktop */
+GAME.isDesktopFeedUi = function () {
+  return !(document.body && document.body.classList.contains('mobile-ui'));
+};
+
+/** Chat satırı: “tıkla sade dil…” imleç yanı ipucu (native title yerine) */
+GAME.ensureFeedLineTip = function () {
+  if (GAME._feedLineTipEl) return GAME._feedLineTipEl;
+  const el = document.createElement('div');
+  el.id = 'feed-line-tip';
+  el.className = 'feed-line-tip hidden';
+  el.setAttribute('role', 'tooltip');
+  document.body.appendChild(el);
+  GAME._feedLineTipEl = el;
+  return el;
+};
+
+GAME.hideFeedLineTip = function () {
+  if (!GAME._feedLineTipEl) return;
+  GAME._feedLineTipEl.classList.add('hidden');
+};
+
+GAME.positionFeedLineTip = function (clientX, clientY) {
+  const el = GAME.ensureFeedLineTip();
+  if (el.classList.contains('hidden')) return;
+  const pad = 8;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  el.style.left = '0px';
+  el.style.top = '0px';
+  const rect = el.getBoundingClientRect();
+  let left = (clientX != null ? clientX : 0) + 14;
+  let top = (clientY != null ? clientY : 0) + 18;
+  if (left + rect.width > vw - pad) left = clientX - rect.width - 12;
+  if (top + rect.height > vh - pad) top = clientY - rect.height - 12;
+  if (left < pad) left = pad;
+  if (top < pad) top = pad;
+  el.style.left = left + 'px';
+  el.style.top = top + 'px';
+};
+
+/** Desktop: satır hover ipucu; terim üzerinde veya mobilde gizli */
+GAME.updateFeedLineTip = function (e) {
+  if (!GAME.isDesktopFeedUi()) {
+    GAME.hideFeedLineTip();
+    return;
+  }
+  if (!e || !e.target || !e.target.closest) {
+    GAME.hideFeedLineTip();
+    return;
+  }
+  // Yıldızlı terimde gri popover var; beyaz satır ipucu kapanır
+  if (e.target.closest('.econ-term') || e.target.closest('#glossary-pop')) {
+    GAME.hideFeedLineTip();
+    return;
+  }
+  const line = e.target.closest('.irc-line.irc-glossable, .irc-line[data-g-raw]');
+  if (!line) {
+    GAME.hideFeedLineTip();
+    return;
+  }
+  const el = GAME.ensureFeedLineTip();
+  const txt = GAME.t ? GAME.t('ui.glossary_line_hint') : '';
+  if (!txt) {
+    GAME.hideFeedLineTip();
+    return;
+  }
+  if (el.textContent !== txt) el.textContent = txt;
+  el.classList.remove('hidden');
+  GAME.positionFeedLineTip(e.clientX, e.clientY);
+};
+
 GAME.ensureGlossaryPop = function () {
   if (GAME._glossaryPopEl) return GAME._glossaryPopEl;
   const el = document.createElement('div');
@@ -450,6 +524,9 @@ GAME.hideGlossaryPop = function () {
 GAME.showGlossaryPop = function (html, anchorEl, clientX, clientY, meta) {
   if (meta && meta.type === 'term' && GAME.isGlossTermMuted(meta.key)) return;
   if (meta && meta.type === 'line' && GAME.isGlossLineMuted(meta.raw)) return;
+
+  // Terim/satır popover açılınca beyaz satır ipucu kapansın
+  GAME.hideFeedLineTip();
 
   const el = GAME.ensureGlossaryPop();
   const t = (k) => (GAME.t ? GAME.t(k) : k);
@@ -509,7 +586,9 @@ GAME.bindGlossaryUiOnce = function () {
   const onTermEnter = function (e) {
     const term = e.target.closest('.econ-term');
     if (!term) return;
-    if (window.innerWidth < 520) return;
+    // Yalnız masaüstü hover terim popover (gri)
+    if (!GAME.isDesktopFeedUi()) return;
+    GAME.hideFeedLineTip();
     const key = term.getAttribute('data-g-key') || '';
     if (GAME.isGlossTermMuted(key)) return;
     const explain = term.getAttribute('data-g-explain') || '';
@@ -518,7 +597,7 @@ GAME.bindGlossaryUiOnce = function () {
     GAME.showGlossaryPop(html, term, e.clientX, e.clientY, { type: 'term', key: key });
   };
   const onTermLeave = function (e) {
-    if (window.innerWidth < 520) return;
+    if (!GAME.isDesktopFeedUi()) return;
     const to = e.relatedTarget;
     if (to && to.closest && (to.closest('#glossary-pop') || to.closest('.econ-term'))) return;
     setTimeout(function () {
@@ -530,13 +609,33 @@ GAME.bindGlossaryUiOnce = function () {
   };
 
   document.addEventListener('mouseover', function (e) {
-    if (e.target.closest && e.target.closest('.econ-term')) onTermEnter(e);
+    if (!e.target.closest) return;
+    if (e.target.closest('.econ-term')) onTermEnter(e);
+    else GAME.updateFeedLineTip(e);
+  });
+  document.addEventListener('mousemove', function (e) {
+    if (!GAME.isDesktopFeedUi()) return;
+    if (e.target.closest && e.target.closest('.econ-term')) {
+      GAME.hideFeedLineTip();
+      return;
+    }
+    if (e.target.closest && e.target.closest('.irc-line')) {
+      GAME.updateFeedLineTip(e);
+    }
   });
   document.addEventListener('mouseout', function (e) {
     if (e.target.closest && e.target.closest('.econ-term')) onTermLeave(e);
+    // satırdan tamamen çıkınca ipucu kapat
+    if (e.target.closest && e.target.closest('.irc-line')) {
+      const to = e.relatedTarget;
+      if (!to || !to.closest || !to.closest('.irc-line')) {
+        GAME.hideFeedLineTip();
+      }
+    }
   });
 
   document.addEventListener('click', function (e) {
+    GAME.hideFeedLineTip();
     if (e.target.closest && e.target.closest('#glossary-pop')) {
       if (e.target.closest('.gpop-mute')) return;
       GAME.hideGlossaryPop();
@@ -575,7 +674,10 @@ GAME.bindGlossaryUiOnce = function () {
   });
 
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') GAME.hideGlossaryPop();
+    if (e.key === 'Escape') {
+      GAME.hideGlossaryPop();
+      GAME.hideFeedLineTip();
+    }
   });
 };
 

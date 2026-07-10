@@ -175,7 +175,7 @@ Own performance · global stability · legacy power · strategic consistency · 
 - Don’t spend all 4 slots every turn.  
 - Effects lag; watch charts for 2–4 turns.  
 - Save is automatic in `localStorage` with `_oyungrok` keys (does not collide with older `/oyun/` builds).  
-- Feed: starred (`*`) terms open plain-language tips; chart chips: desktop hover, mobile second-tap tip.  
+- Feed: desktop line hover = cursor tip; starred (`*`) terms = grey glossary pop; line click = plain summary. Mobile: no white line tip (tap only). Chart chips: desktop hover, mobile second-tap tip.  
 - **Settings** / **Advanced settings** (desktop spreadsheet of constants) live under the main menu.
 
 ---

@@ -228,7 +228,7 @@ GAME.renderFeed = function () {
       div.innerHTML = time + '*** ' + src + gloss.title + (gloss.body ? ' — ' + gloss.body : '') + gloss.effect;
     }
     if (gloss.raw) div.setAttribute('data-g-raw', gloss.raw);
-    div.setAttribute('title', GAME.t ? GAME.t('ui.glossary_line_hint') : '');
+    // Native title YOK: mobilde beyaz balon çıkmasın; masaüstünde imleç yanı ipucu (glossary.js)
     // Aynı renkte iki ardışık mesaj: biri normal, biri kalın (mIRC okunabilirliği)
     const key = (cid || 'sys') + '|' + toneCls;
     const alt = (key === prevKey) ? !prevBold : false;

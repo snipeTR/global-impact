@@ -13,6 +13,15 @@ _(Boş — sıradaki iş buraya)_
 
 ---
 
+## 2026-07-10 — Chat satır ipucu: imleç yanı (desktop); mobilde yok
+
+- Native `title` kaldırıldı (beyaz sistem balonu + çift ipucu).
+- Masaüstü: “satıra tıkla sade dil…” metni **imleç yanında** (`#feed-line-tip`).
+- Yıldızlı (`*`) terimde gri `#glossary-pop` aynı; satır ipucu o sırada kapanır.
+- Mobil (`body.mobile-ui`): beyaz satır ipucu **hiç** gösterilmez (CSS + JS).
+
+---
+
 ## 2026-07-10 — Ayarlar: chat hızı (yavaş / hızlı)
 
 - Ana menü **Ayarlar**: Chat hızı — iki yuvarlak seçim (**Yavaş** / **Hızlı**).

@@ -222,7 +222,7 @@ Avrupa Birliği **tek varlık**tır; Almanya ayrı seçilemez (AB içinde temsil
 - En solda bir kez daha sağa kaydırırsan en sağa (veya tersi) **döngü** ile atlanır.  
 - Turu onayladıktan sonra mobil otomatik **Olaylar** sekmesine geçer (tepki akışını izle).  
 - Sayfanın geneli iki parmakla zoomlanmaz; **sadece haritada** pinch zoom vardır.  
-- **Olaylar / feed:** yıldızlı (`*`) ekonomi terimlerine gel/tıkla → sade dil; satıra tık → satır özeti.  
+- **Olaylar / feed:** masaüstünde satır hover → imleç yanı ipucu; yıldızlı (`*`) terim → gri açıklama; satıra tık → sade dil özeti. Mobilde beyaz satır ipucu yok (yalnız tık).  
 - **Grafik çipleri:** masaüstünde hover ipucu; mobilde 1. tık seçim, aynı çipe 2. tık açıklama.
 
 ## 1.9 Harita

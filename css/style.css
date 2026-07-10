@@ -381,6 +381,20 @@ body.viewport-blocked .screen{visibility:hidden; pointer-events:none;}
 .econ-term:hover, .econ-term:focus{
   background:#ffffcc; outline:none;
 }
+/* Satır ipucu: masaüstü imleç yanı (native title yerine — mobilde yok) */
+.feed-line-tip{
+  position:fixed; z-index:310; pointer-events:none;
+  background:#ffffe1; color:#000;
+  border:1px solid #000;
+  padding:3px 7px; font-size:11px; line-height:1.35;
+  font-family:Tahoma,"MS Sans Serif",sans-serif;
+  max-width:300px;
+  box-shadow:1px 1px 0 rgba(0,0,0,.2);
+  white-space:normal;
+}
+.feed-line-tip.hidden{display:none !important;}
+body.mobile-ui .feed-line-tip{display:none !important;}
+/* Yıldızlı terim / satır özeti: Win95 gri panel */
 .glossary-pop{
   background:var(--face); color:var(--text);
   border:2px solid; border-color:#ffffff #404040 #404040 #ffffff;
