@@ -6,8 +6,7 @@
 After a major global disaster you govern your chosen country using **economic instruments only**. Watch how each rate change, sanction, or project ripples across the world in the short, medium, and long run.
 
 > There is no classic win/lose. The goal is to *feel* what happens when you change a tool.
-> <img width="2880" height="1524" alt="image" src="https://github.com/user-attachments/assets/6e789422-815a-4ef6-8c41-3d5822725513" />
-
+> <img width="2874" height="1530" alt="image" src="https://github.com/user-attachments/assets/97a72f05-cfd5-4f18-8d29-f980d5b4cf41" />
 
 | | |
 |--|--|
