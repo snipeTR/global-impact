@@ -189,6 +189,12 @@ Modern browser; optional **Node.js** 18+ for `serve.js` / tests. No npm install.
 ```bash
 git clone https://github.com/snipeTR/global-impact.git
 cd global-impact
+
+# Linux/macOS: install/check publish deps (git, rsync, curl, node, …)
+bash tools/INSTALL.sh
+# bash tools/INSTALL.sh --check-only
+# bash tools/INSTALL.sh --with-nginx   # if hosting with nginx
+
 node serve.js
 # → http://localhost:8123
 ```

@@ -13,6 +13,15 @@ _(Boş — sıradaki iş buraya)_
 
 ---
 
+## 2026-07-10 — tools/INSTALL.sh: çoklu distro/mimari paket kurulumu
+
+- `tools/INSTALL.sh`: git, rsync, curl, ca-certificates, openssh, nodejs (opsiyonel nginx).
+- apt/dnf/yum/zypper/pacman/apk/brew; arch: x86_64, arm64, armv7, …
+- Önce kontrol + rapor; onay sonrası kurulum; hata + kısa yardım.
+- `--check-only`, `--yes`, `--with-nginx`, `--help`.
+
+---
+
 ## 2026-07-10 — Finalize: bugfix + agent/test senkron
 
 - Haber `source` / tur status: emoji bayrak yok → `countryText` / `countrySource` (Windows harf çifti yok).

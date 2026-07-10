@@ -287,3 +287,4 @@ lang/
 - Yeni dil eklemek: `lang/<kod>/pack.js` yaz → `GAME.i18n.supported` (`short: 'XX'`) → `index.html` script tag.
 - Yeni UI metni: `data-i18n` veya `GAME.t('ui.…')` + her dil paketinde anahtar.
 - `tools/build-lang-*.js` paket üretici (runtime zorunlu değil).
+- `tools/INSTALL.sh` — Linux/macOS çoklu distro/mimari: git/rsync/curl/ssh/node (+ opsiyonel nginx) kontrol + onaylı kurulum.

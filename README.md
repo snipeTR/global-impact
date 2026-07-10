@@ -295,6 +295,12 @@ Bağımlılık yöneticisi yok: **npm install yok**, bundler yok, framework yok.
 ```bash
 git clone https://github.com/snipeTR/global-impact.git
 cd global-impact
+
+# Linux/macOS: yayın + dev paketlerini kontrol/kur (git, rsync, curl, node, …)
+bash tools/INSTALL.sh
+# bash tools/INSTALL.sh --check-only   # yalnız rapor
+# bash tools/INSTALL.sh --with-nginx   # canlı web sunucu rolü
+
 node serve.js
 # → http://localhost:8123
 ```
@@ -348,7 +354,7 @@ global-impact/
 │       ├── mobile.js       # 5 sekme, swipe, döngü
 │       ├── music.js        # fade + playlist + ses basamakları
 │       └── main.js         # onay modalı, runTurnAnimated, resume
-├── tools/                  # i18n build, desc sync, deploy sarmalayıcı
+├── tools/                  # INSTALL.sh, i18n, desc sync, deploy sarmalayıcı
 ├── CHANGELOG.md
 ├── test-consistency.js
 ├── serve.js
