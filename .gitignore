@@ -5,8 +5,15 @@ YAPILACAKLAR.md
 *.key
 id_rsa*
 *ssh-key*
+id_ed25519*
+*.secret
+secrets/
 .env
 .env.*
+.env.local
+credentials*
+**/ssh/
+!tools/
 
 # OS / editör
 .DS_Store

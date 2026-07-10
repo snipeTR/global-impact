@@ -21,6 +21,14 @@
 
 ## localStorage anahtarları (istemci)
 
-- `kureselEtkiSave_oyungrok`
-- `kureselEtkiTurnJob_oyungrok`
-- `keFeedCollapsed_oyungrok`
+| Anahtar | Amaç |
+|---------|------|
+| `kureselEtkiSave_oyungrok` | Kalıcı oyun kaydı |
+| `kureselEtkiTurnJob_oyungrok` | Yarım tur AI script |
+| `keFeedCollapsed_oyungrok` | Feed daraltma |
+| `keLang_oyungrok` | Dil (tr/en) |
+| `keSettings_oyungrok` | Ayarlar paneli tercihleri |
+| `keTunables_oyungrok` | Gelişmiş ayarlar (sabitler) |
+| `keGlossSkip_oyungrok` | Sözlük “bir daha gösterme” |
+
+> Gerçek sunucu IP / SSH **asla** bu public örneğe veya public commit’e yazılmaz.

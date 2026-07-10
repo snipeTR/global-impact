@@ -13,6 +13,22 @@ _(Boş — sıradaki iş buraya)_
 
 ---
 
+## 2026-07-10 — Güvenlik denetimi + README/CHANGELOG senkronu
+
+### Sızıntı taraması (public `global-impact`)
+- Git geçmişi: IP, SSH private key, `YAPILACAKLAR.md` **yok** (hiç commit edilmemiş).
+- GitHub Secret Scanning alert: **0**. Push protection: **açık**.
+- Dependabot security updates: **açık**.
+- `main` branch ruleset: silme + force-push engeli (`main-protect`).
+- Private `kuresel-etki-secrets` ayrı kalır; free planda private secret scanning yok (GHAS gerekir).
+
+### Dokümantasyon
+- README TR/EN: Ayarlar, Gelişmiş ayarlar, sözlük, Sıfırla, maliyet kuralları, tam `localStorage` listesi, script sırası, güvenlik notları.
+- CHANGELOG: deploy key dosya adı sadeleştirildi (operasyonel sır azaltımı).
+- `AGENTS.md` + `YAPILACAKLAR.example.md`: eksik anahtarlar / güvenlik.
+
+---
+
 ## 2026-07-10 — Gelişmiş ayarlar (excel tablo, masaüstü)
 
 - `js/core/tunables.js`: oyun/enstrüman/ülke/timescale sabitleri; `keTunables_oyungrok`.
@@ -92,15 +108,15 @@ _(Boş — sıradaki iş buraya)_
 ## 2026-07-10 — GitHub deploy script + full server deploy
 
 ### Deploy
-- Private repo `deploy/`: `setup-git-auth.sh`, `deploy-from-github.sh`, `bootstrap-server.sh`, nginx deny snippet.
-- Sunucu: `git` + `rsync` kuruldu; private repo için **deploy key** (`id_ed25519_github_secrets`).
-- Script public `global-impact` + private `kuresel-etki-secrets` çeker, `/var/www/html/oyungrok` birleştirir.
-- Gizli dosyalar sunucuda da yüklü; **HTTP 403** (`YAPILACAKLAR.md`, `ssh/*`) — oyun dosyaları 200.
-- Public sarmalayıcı: `tools/deploy-from-github.sh`.
+- Private repo `deploy/`: kurulum + GitHub’dan çekme scriptleri; nginx gizli path deny snippet.
+- Sunucu: `git` + `rsync`; private secrets için **repo-scoped deploy key** (dosya adları public’e yazılmaz).
+- Script public `global-impact` + private `kuresel-etki-secrets` çeker; yalnız `/oyungrok` web köküne birleştirir.
+- Gizli dosyalar sunucuda da yüklüyse HTTP **403** (`YAPILACAKLAR.md`, `ssh/*`); oyun dosyaları 200.
+- Public sarmalayıcı: `tools/deploy-from-github.sh` (asıl script private’da).
 
 ### Not
-- Deploy key tek repoya özel (GitHub kuralı); public HTTPS, private SSH key.
-- ASLA `/oyun/` path.
+- Deploy key tek private repoya özel; public klon HTTPS.
+- ASLA `/oyun/` path; IP/SSH public commit’e girmez.
 
 ---
 

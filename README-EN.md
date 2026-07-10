@@ -43,6 +43,18 @@ No coding required.
 - **Desktop game:** same select **inside the game window**, bottom-right.
 - **Mobile:** same select **inside the mobile chrome**, bottom-right (above tab bar).
 - Preference stored in the browser (`keLang_oyungrok`).
+- Language can also be changed under **Main menu → Settings**.
+
+## 1.0b Settings & Advanced settings
+
+### Settings (main menu)
+**Settings**: language, volume step, new-game confirm, collapse feed by default (desktop), reset glossary “don’t show again”.  
+Stored only in this browser (`keSettings_oyungrok`); never sent to a server.
+
+### Advanced settings (desktop only)
+Settings → **Advanced settings**: spreadsheet-like table of game constants, instrument costs, country baselines.  
+Columns: **variable | value | default | description** (TR/EN). Filter, group, save, text import/export, reset to defaults.  
+Hidden on mobile. Storage: `keTunables_oyungrok`.
 
 ## 1.1 How to run
 
@@ -92,12 +104,15 @@ Then open **http://localhost:8123**
 | Rule | Meaning |
 |------|---------|
 | **4 slots** | At most 4 *changes* per turn. Leaving a policy as-is costs no slot. |
-| **Political capital** | Interventions spend points; higher approval regenerates faster. |
+| **Political capital** | Interventions spend points. Insufficient capital **blocks** turn commit. |
+| **Escalating cost** | Rate / tax / spending: base **2**, **+1** each confirmed use. FX intervention: **3**; regen penalty every 4 uses. |
+| **Reset** | Next to Event Log: cancel all pending instrument changes before confirm. |
 | **Time** | Some effects are immediate; others take years. Read the charts. |
 | **Projects** | Long jobs advance without slots; completion leaves **permanent legacy**. |
 | **Grey zone** | Espionage, disinfo, etc. risk exposure → scandal + retaliation. |
 | **Targeted tools** | Some instruments need a target country. |
 | **Crisis music** | On disaster, calm music fades; crisis playlist cycles. |
+| **Glossary (*)** | Starred terms in the feed: hover/tap for plain-language tips. |
 
 ## 1.4 Indicators
 
@@ -157,7 +172,9 @@ Own performance · global stability · legacy power · strategic consistency · 
 
 - Don’t spend all 4 slots every turn.  
 - Effects lag; watch charts for 2–4 turns.  
-- Save is automatic in `localStorage` with `_oyungrok` keys (does not collide with older `/oyun/` builds).
+- Save is automatic in `localStorage` with `_oyungrok` keys (does not collide with older `/oyun/` builds).  
+- Feed: starred (`*`) terms open plain-language tips; chart chips: desktop hover, mobile second-tap tip.  
+- **Settings** / **Advanced settings** (desktop spreadsheet of constants) live under the main menu.
 
 ---
 
@@ -196,12 +213,14 @@ global-impact/
 ├── lang/                   # i18n
 ├── assets/world-map.svg
 ├── music/
-├── js/data|core|ui/
-├── AGENTS.md
+├── js/data/                # countries, instruments, disasters, glossary
+├── js/core/                # state, tunables, effects, turn, ai…
+├── js/ui/                  # panels, screens (settings/advanced), charts…
+├── tools/                  # i18n, desc sync, deploy wrapper
+├── AGENTS.md · CHANGELOG.md
 ├── YAPILACAKLAR.example.md # public template only
-├── README.md               # Turkish
-├── README-EN.md            # English (this file)
-├── .gitignore              # keeps YAPILACAKLAR.md out of public git
+├── README.md / README-EN.md
+├── .gitignore              # YAPILACAKLAR.md, keys, ssh, .env out of public git
 └── serve.js / test-consistency.js
 ```
 
@@ -210,10 +229,23 @@ global-impact/
 | Topic | Decision |
 |-------|----------|
 | Framework | None — `window.GAME` |
-| Load order | data → core → ui (see `index.html`) |
-| Save keys | `*_oyungrok` only |
+| Load order | lang → data (+glossary) → state → **tunables** → core → ui (see `index.html`) |
+| Save keys | `*_oyungrok` only (see table below) |
 | AI turn | Plan full script → delayed replay; on interrupt **restart from preAi** |
 | Mobile | Move DOM into tabs under `body.mobile-ui` |
+| Advanced constants | `js/core/tunables.js` + desktop UI; `keTunables_oyungrok` |
+
+### localStorage keys
+
+| Key | Purpose |
+|-----|---------|
+| `kureselEtkiSave_oyungrok` | Permanent save (after completed turn) |
+| `kureselEtkiTurnJob_oyungrok` | Incomplete turn AI script |
+| `keFeedCollapsed_oyungrok` | Feed collapsed preference |
+| `keLang_oyungrok` | Language |
+| `keSettings_oyungrok` | Settings panel |
+| `keTunables_oyungrok` | Advanced constants |
+| `keGlossSkip_oyungrok` | Glossary “don’t show again” |
 
 ### Turn model v2 (critical)
 
@@ -308,7 +340,7 @@ If `gh` is authenticated as an account with access, prefer reading the private r
 
 ## 3.4 Script load order
 
-`lang/i18n` + packs → countries → instruments → disasters → state → effects → internal → diplomacy → news → ai → turn → charts → help → music → panels → screens → mobile → main
+`lang/i18n` + packs → countries → instruments → disasters → **glossary** → state → **tunables** → effects → internal → diplomacy → news → ai → turn → charts → help → music → panels → screens → mobile → main
 
 ## 3.5 Checklist
 
@@ -321,6 +353,17 @@ If `gh` is authenticated as an account with access, prefer reading the private r
 - [ ] `YAPILACAKLAR.md` / keys **not** staged for public  
 - [ ] Durable rule → AGENTS.md; private deploy notes → secrets repo if owner updates them  
 - [ ] Private secrets never leaked to public  
+- [ ] CHANGELOG entry + GitHub push + `/oyungrok` deploy triad  
+
+## 3.5b Security (public repo)
+
+| Topic | Rule / status |
+|-------|----------------|
+| Public code | No server IP / SSH private keys |
+| Secrets backup | Private `kuresel-etki-secrets` only |
+| `.gitignore` | `YAPILACAKLAR.md`, `*.key`, `**/ssh/`, `.env*` |
+| GitHub | Secret scanning + push protection; Dependabot; `main` ruleset (no force-push/delete) |
+| Live deploy | `/oyungrok/` only — never `/oyun/` |
 
 ## 3.6 Working style
 

@@ -118,8 +118,13 @@ ekonomi oyunu/
 | `kureselEtkiSave_oyungrok` | Kalıcı oyun (complete tur sonrası) |
 | `kureselEtkiTurnJob_oyungrok` | Yarım tur script (`complete:false`) |
 | `keFeedCollapsed_oyungrok` | Feed daraltma |
+| `keLang_oyungrok` | Dil tercihi (`tr` / `en`) |
+| `keSettings_oyungrok` | Ayarlar paneli (ses, onay, feed varsayılanı) |
+| `keTunables_oyungrok` | Gelişmiş ayarlar — oyun/enstrüman/ülke sabitleri |
+| `keGlossSkip_oyungrok` | Haber sözlüğü “bir daha gösterme” (kalıcı) |
 
-**Eski `/oyun/` sürümü `kureselEtkiSave` kullanır — karıştırma / üzerine yazma.**
+**Eski `/oyun/` sürümü `kureselEtkiSave` kullanır — karıştırma / üzerine yazma.**  
+**Public commit’e asla:** sunucu IP, SSH private key, gerçek `YAPILACAKLAR.md`, deploy env.
 
 ### Onayla ve İlerle
 1. Modal: bekleyen enstrüman özeti + “emin misin?”
