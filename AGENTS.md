@@ -223,6 +223,13 @@ Konsolda: `GAME.countNewsTemplates()`, `GAME.testInstrumentPaging()`.
     Gizli dosya değiştiyse ayrıca private `kuresel-etki-secrets` push.  
     Kullanıcı “sadece local” demedikçe bu üç adım atlanmaz.
 
+### 10.0 Yardım / about metinleri
+
+- Baseline TR: `js/ui/help.js` (`HELP_TOPICS`, `ABOUT_MAIN_HTML`).
+- Pack override: `lang/tr|en/pack.js` → `help` + `about` (`tools/sync-help-i18n.js`).
+- Yeni mekanik (maliyet, ayar, UI): **help.js + TR/EN about/help + CHANGELOG** birlikte güncelle.
+- Tooltip çapraz kurallar: `GAME.CROSS_RULES_I18N` (tr/en).
+
 ### 10.1 Enstrüman tooltip / açıklama senkronu (zorunlu)
 
 Hover özet (`GAME.instrumentDetail`) metni `ins.desc` + dinamik maliyet + `CROSS_RULES` kullanır.

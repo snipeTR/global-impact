@@ -13,6 +13,15 @@ _(Boş — sıradaki iş buraya)_
 
 ---
 
+## 2026-07-10 — Yardım/about metin uyumu (TR+EN) + tooltip i18n
+
+- `help.js` / `lang/*/pack.js`: makro escalate, FX maliyet 3, Sıfırla, yetersiz sermaye, chat hızı, sözlük, Ayarlar/gelişmiş, PNG bayraklar, tur v2.
+- Yardım modalı metinleri i18n (`help_intro`, `advice_title`…).
+- `CROSS_RULES` → `CROSS_RULES_I18N` (TR+EN); tooltip başlıkları dil bilincili.
+- `tools/sync-help-i18n.js`, `tools/patch-help-ui-i18n.js`.
+
+---
+
 ## 2026-07-10 — Ülke bayrakları: PNG + Win95 çerçeve
 
 - Windows’ta emoji bayraklar CA/BR harfine düşüyordu → `assets/flags/*.png` (17 ülke).

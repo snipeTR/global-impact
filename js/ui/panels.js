@@ -272,31 +272,71 @@ GAME.TS_LABEL = { imm: 'Anında (0-6 ay)', short: 'Kısa vade (3-15 ay)', med: '
 GAME.TS_NARR = { imm: 'hemen', short: '3-12 ay içinde', med: '1-3 yıl içinde', long: 'uzun vadede (3+ yıl)' };
 
 /* Etki motorundaki çapraz çarpan kurallarının insan diliyle açıklaması */
-GAME.CROSS_RULES = {
-  policy_rate: ['Siyasi sermaye: taban 2 + onaylanan kullanım sayısı (her seferinde +1 maliyet).',
-                'Kamu borcu GDP\'nin %100\'ünü aşmışsa tüm etkiler 1.35×; %200+ ise ek 1.15× (borç servisi).',
-                'Sermaye kontrolü (seviye >30) aktifken kur etkisi 1.3× güçlenir.',
-                'Yüksek faiz + yüksek borç her çeyrek borç stokunu büyütür (servis maliyeti).'],
-  tax_rate: ['Siyasi sermaye: taban 2 + onaylanan kullanım sayısı (her seferinde +1 maliyet).'],
-  public_spending: ['Siyasi sermaye: taban 2 + onaylanan kullanım sayısı (her seferinde +1 maliyet).'],
-  fx_intervention: ['Siyasi sermaye maliyeti sabit 3.',
-                    'Her 4 onaylanan kullanımda siyasi sermaye yenilenmesi −1, −2, −3… (floor(uses/4)).',
-                    'Müdahale artışı: enflasyon ~4 çeyrek gecikmeyle hafif ve uzun sızar.',
-                    'Enflasyon %30+ ise kur etkisi 0.7×, %50+ ise ek 0.75× zayıflar.',
-                    'Rezerv 60 mlr$ altındaysa etki 0.5×. Açık kaldıkça rezerv hızla erir.'],
-  shadow_fx: ['Rezerv 60 mlr$ altındaysa 0.5×; yüksek enflasyonda etkinlik düşer.'],
-  strategic_stock: ['Aktif felaket sırasında etkisi 1.4× güçlenir.'],
-  price_controls: ['Felaket sırasında 1.25× daha etkili (kısa vadeli sosyal rahatlama).'],
-  qe: ['Enflasyon %8+ iken enflasyon/kur yan etkileri 1.3× güçlenir.',
-       'Politika faizi %2 altındayken büyüme etkisi 1.2× (likidite tuzağına yakın).'],
-  energy_weapon: ['Yalnızca net enerji ihracatçılarında (deps.oil < 0) tam güç; ithalatçıda ~0.35×.'],
-  food_weapon: ['Yalnızca net gıda ihracatçılarında (deps.food < 0) tam güç; ithalatçıda ~0.35×.'],
-  secondary_sanctions: ['Küresel Etki >70 ise 1.15×. Hedefin ticaret ortaklarına yan sızıntı uygular.'],
-  asset_freeze: ['Rezerv şoku hedefin rezervi ve senin finansal gücünle ölçeklenir (sınırsız değil).',
-                 'Küresel Etki >70 ise genel etki 1.15×.'],
-  rating_pressure: ['Küresel Etki >70 ise 1.15× (finans merkezleri daha etkili).'],
-  tariff: ['Ticaret fazlası yüksekken korumacılığın trade kazancı biraz güçlenir.']
+GAME.CROSS_RULES_I18N = {
+  tr: {
+    policy_rate: ['Siyasi sermaye: taban 2 + onaylanan kullanım sayısı (her seferinde +1 maliyet).',
+      'Kamu borcu GDP\'nin %100\'ünü aşmışsa tüm etkiler 1.35×; %200+ ise ek 1.15× (borç servisi).',
+      'Sermaye kontrolü (seviye >30) aktifken kur etkisi 1.3× güçlenir.',
+      'Yüksek faiz + yüksek borç her çeyrek borç stokunu büyütür (servis maliyeti).'],
+    tax_rate: ['Siyasi sermaye: taban 2 + onaylanan kullanım sayısı (her seferinde +1 maliyet).'],
+    public_spending: ['Siyasi sermaye: taban 2 + onaylanan kullanım sayısı (her seferinde +1 maliyet).'],
+    fx_intervention: ['Siyasi sermaye maliyeti sabit 3.',
+      'Her 4 onaylanan kullanımda siyasi sermaye yenilenmesi −1, −2, −3… (floor(uses/4)).',
+      'Müdahale artışı: enflasyon ~4 çeyrek gecikmeyle hafif ve uzun sızar.',
+      'Enflasyon %30+ ise kur etkisi 0.7×, %50+ ise ek 0.75× zayıflar.',
+      'Rezerv 60 mlr$ altındaysa etki 0.5×. Açık kaldıkça rezerv hızla erir.'],
+    shadow_fx: ['Rezerv 60 mlr$ altındaysa 0.5×; yüksek enflasyonda etkinlik düşer.'],
+    strategic_stock: ['Aktif felaket sırasında etkisi 1.4× güçlenir.'],
+    price_controls: ['Felaket sırasında 1.25× daha etkili (kısa vadeli sosyal rahatlama).'],
+    qe: ['Enflasyon %8+ iken enflasyon/kur yan etkileri 1.3× güçlenir.',
+      'Politika faizi %2 altındayken büyüme etkisi 1.2× (likidite tuzağına yakın).'],
+    energy_weapon: ['Yalnızca net enerji ihracatçılarında (deps.oil < 0) tam güç; ithalatçıda ~0.35×.'],
+    food_weapon: ['Yalnızca net gıda ihracatçılarında (deps.food < 0) tam güç; ithalatçıda ~0.35×.'],
+    secondary_sanctions: ['Küresel Etki >70 ise 1.15×. Hedefin ticaret ortaklarına yan sızıntı uygular.'],
+    asset_freeze: ['Rezerv şoku hedefin rezervi ve senin finansal gücünle ölçeklenir (sınırsız değil).',
+      'Küresel Etki >70 ise genel etki 1.15×.'],
+    rating_pressure: ['Küresel Etki >70 ise 1.15× (finans merkezleri daha etkili).'],
+    tariff: ['Ticaret fazlası yüksekken korumacılığın trade kazancı biraz güçlenir.']
+  },
+  en: {
+    policy_rate: ['Political capital: base 2 + confirmed uses (+1 cost each time).',
+      'If public debt >100% of GDP, all effects ×1.35; >200% adds ×1.15 (debt service).',
+      'With capital controls (level >30), FX channel of the rate ×1.3.',
+      'High rates + high debt grow the debt stock each quarter (service cost).'],
+    tax_rate: ['Political capital: base 2 + confirmed uses (+1 cost each time).'],
+    public_spending: ['Political capital: base 2 + confirmed uses (+1 cost each time).'],
+    fx_intervention: ['Political capital cost fixed at 3.',
+      'Every 4 confirmed uses: political-capital regen −1, −2, −3… (floor(uses/4)).',
+      'Raising intervention: mild long inflation seeps in after ~4 quarters.',
+      'If inflation ≥30%, FX effect ×0.7; ≥50% another ×0.75.',
+      'If reserves <60 bn$, effect ×0.5. Staying open drains reserves quickly.'],
+    shadow_fx: ['If reserves <60 bn$, ×0.5; high inflation weakens effectiveness.'],
+    strategic_stock: ['During an active disaster, effect ×1.4.'],
+    price_controls: ['During disaster, ×1.25 more effective (short-run social relief).'],
+    qe: ['If inflation ≥8%, inflation/FX side effects ×1.3.',
+      'If policy rate <2%, growth effect ×1.2 (near liquidity trap).'],
+    energy_weapon: ['Full power only for net energy exporters (deps.oil < 0); importers ~0.35×.'],
+    food_weapon: ['Full power only for net food exporters (deps.food < 0); importers ~0.35×.'],
+    secondary_sanctions: ['If Global Influence >70, ×1.15. Spills to the target’s trade partners.'],
+    asset_freeze: ['Reserve shock scales with target reserves and your financial power (not unlimited).',
+      'If Global Influence >70, general effect ×1.15.'],
+    rating_pressure: ['If Global Influence >70, ×1.15 (financial centres pack more punch).'],
+    tariff: ['With a large trade surplus, protectionist trade gains are a bit stronger.']
+  }
 };
+/** Dil bilincili çapraz kurallar (tooltip) */
+GAME.getCrossRules = function (insId) {
+  const lang = (GAME.i18n && GAME.i18n.getLang && GAME.i18n.getLang()) || 'tr';
+  const pack = (GAME.CROSS_RULES_I18N && (GAME.CROSS_RULES_I18N[lang] || GAME.CROSS_RULES_I18N.tr)) || {};
+  return pack[insId] || null;
+};
+/* geriye uyum */
+Object.defineProperty(GAME, 'CROSS_RULES', {
+  get: function () {
+    const lang = (GAME.i18n && GAME.i18n.getLang && GAME.i18n.getLang()) || 'tr';
+    return (GAME.CROSS_RULES_I18N && (GAME.CROSS_RULES_I18N[lang] || GAME.CROSS_RULES_I18N.tr)) || {};
+  }
+});
 GAME.RISK_PCT = { 1: '%3,5', 2: '%7', 3: '%12' };
 
 GAME.KEY_LABEL = function (k) {
@@ -402,13 +442,15 @@ GAME.instrumentDetail = function (ins) {
     }).join(', ');
     secs.push('<b>İç gruplara etkisi:</b><br>' + g);
   }
-  if (GAME.CROSS_RULES[ins.id])
-    secs.push('<b>⚡ Çapraz etki kuralları:</b><br>' + GAME.CROSS_RULES[ins.id].map(r => '· ' + r).join('<br>'));
+  const cross = GAME.getCrossRules ? GAME.getCrossRules(ins.id) : (GAME.CROSS_RULES && GAME.CROSS_RULES[ins.id]);
+  const tUi = (k, v) => (GAME.t ? GAME.t(k, v) : k);
+  if (cross && cross.length)
+    secs.push('<b>⚡ ' + tUi('ui.cross_rules_title') + ':</b><br>' + cross.map(r => '· ' + r).join('<br>'));
   if (ins.risk)
-    secs.push('<b style="color:#c00000">☠ Gri alan riski:</b> Açık kaldığı her çeyrek ' + GAME.RISK_PCT[ins.risk] +
-      ' tespit şansı. Tespitte: hedefle ilişki -70, herkesle -15, misilleme vergisi, Küresel Etki -5, Toplum Onayı -4.');
+    secs.push('<b style="color:#c00000">☠ ' + tUi('ui.grey_risk_title') + ':</b> ' +
+      tUi('ui.grey_risk_body', { pct: GAME.RISK_PCT[ins.risk] }));
   const scn = GAME.scenarioText(ins);
-  if (scn) secs.push('<b>📜 Senaryo:</b> ' + scn);
+  if (scn) secs.push('<b>📜 ' + tUi('ui.scenario_title') + ':</b> ' + scn);
   return h + secs.map(sc => '<div class="tt-sec">' + sc + '</div>').join('');
 };
 
@@ -847,10 +889,10 @@ GAME.buildAdvice = function () {
 
 GAME.helpTopicBarHtml = function () {
   return '<div class="help-topic-bar">' +
-    '<button class="btn" data-topic="instruments">📚 Enstrümanlar</button>' +
-    '<button class="btn" data-topic="countries">🌍 Ülkeler</button>' +
-    '<button class="btn" data-topic="charts">📈 Grafikler</button>' +
-    '<button class="btn" data-topic="topics">📖 Konular &amp; Sistem</button>' +
+    '<button class="btn" data-topic="instruments">' + (GAME.t ? GAME.t('ui.topic_instruments') : '📚 Enstrümanlar') + '</button>' +
+    '<button class="btn" data-topic="countries">' + (GAME.t ? GAME.t('ui.topic_countries') : '🌍 Ülkeler') + '</button>' +
+    '<button class="btn" data-topic="charts">' + (GAME.t ? GAME.t('ui.topic_charts') : '📈 Grafikler') + '</button>' +
+    '<button class="btn" data-topic="topics">' + (GAME.t ? GAME.t('ui.topic_system') : '📖 Konular &amp; Sistem') + '</button>' +
     '</div><div id="help-topic-detail"></div>';
 };
 
@@ -868,14 +910,16 @@ GAME.bindHelpTopicBar = function (root) {
 };
 
 GAME.showAdvice = function () {
+  const t = (k, v) => (GAME.t ? GAME.t(k, v) : k);
   document.getElementById('modal-box').classList.remove('map-mode');
-  document.getElementById('modal-title').textContent = '🧭 Danışma Kurulu Önerileri — ' + GAME.turnDate(GAME.state.turn);
+  document.getElementById('modal-title').textContent =
+    t('ui.advice_title') + ' — ' + GAME.turnDate(GAME.state.turn);
   document.getElementById('modal-body').innerHTML = GAME.buildAdvice() + GAME.helpTopicBarHtml();
   GAME.bindHelpTopicBar(document.getElementById('modal-body'));
   const btns = document.getElementById('modal-buttons');
   btns.innerHTML = '';
   const b = document.createElement('button');
-  b.className = 'btn btn-primary'; b.textContent = 'Kapat'; b.onclick = GAME.closeModal;
+  b.className = 'btn btn-primary'; b.textContent = t('ui.close_modal'); b.onclick = GAME.closeModal;
   btns.appendChild(b);
   document.getElementById('modal-backdrop').classList.remove('hidden');
 };
@@ -883,22 +927,22 @@ GAME.showAdvice = function () {
 GAME.openHelpModal = function () {
   if (GAME.ui.processing || !GAME.state) return;
   if (GAME.ui.helpConsent) { GAME.showAdvice(); return; }
+  const t = (k, v) => (GAME.t ? GAME.t(k, v) : k);
   document.getElementById('modal-box').classList.remove('map-mode');
-  document.getElementById('modal-title').textContent = '❓ Yardım';
+  document.getElementById('modal-title').textContent = t('ui.help');
   document.getElementById('modal-body').innerHTML =
-    '<p><b>Danışma Kurulu:</b> Hangi enstrümanı kullanmanız gerektiğine dair tur bazlı öneri verir.</p>' +
-    '<p style="margin-top:8px;color:#505050">Ayrıca alttaki butonlardan enstrümanlar, ülkeler, grafikler ve sistem ' +
-    'hakkında çok detaylı ansiklopedi okuyabilirsiniz.</p>' +
-    '<p style="margin-top:10px"><b>Bu çeyrek için öneri istiyor musunuz?</b></p>' +
+    '<p><b>' + t('ui.advisory') + ':</b> ' + t('ui.help_intro') + '</p>' +
+    '<p style="margin-top:8px;color:#505050">' + t('ui.help_intro_detail') + '</p>' +
+    '<p style="margin-top:10px"><b>' + t('ui.help_ask_advice') + '</b></p>' +
     GAME.helpTopicBarHtml();
   GAME.bindHelpTopicBar(document.getElementById('modal-body'));
   const btns = document.getElementById('modal-buttons');
   btns.innerHTML = '';
   const yes = document.createElement('button');
-  yes.className = 'btn btn-primary'; yes.textContent = 'Evet, öneri ver';
+  yes.className = 'btn btn-primary'; yes.textContent = t('ui.help_yes_advice');
   yes.onclick = () => { GAME.ui.helpConsent = true; GAME.showAdvice(); };
   const no = document.createElement('button');
-  no.className = 'btn'; no.textContent = 'Kapat'; no.onclick = GAME.closeModal;
+  no.className = 'btn'; no.textContent = t('ui.close_modal'); no.onclick = GAME.closeModal;
   btns.appendChild(yes); btns.appendChild(no);
   document.getElementById('modal-backdrop').classList.remove('hidden');
 };

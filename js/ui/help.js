@@ -1,4 +1,7 @@
-/* ============ KÜRESEL ETKİ — Yardım Ansiklopedisi (çok detaylı) ============ */
+/* ============ KÜRESEL ETKİ — Yardım Ansiklopedisi (çok detaylı) ============
+   TR baseline: i18n pack (lang/tr|en/pack.js help+about) overrides this.
+   On mechanic change: update this file + EN via tools/sync-help-i18n.js
+*/
 window.GAME = window.GAME || {};
 
 GAME.HELP_TOPICS = {};
@@ -25,10 +28,11 @@ GAME.HELP_TOPICS.instruments =
 
   '<h5>Katman 2 — Konjonktürel + Makro</h5>' +
   '<ul>' +
+  '<li><b>Politika faizi, vergi, kamu harcaması:</b> Taban siyasi sermaye maliyeti <b>2</b>; her <b>onaylanan</b> kullanımda maliyet <b>+1</b> artar (ucuz başlar, sık kullanım pahalılaşır).</li>' +
   '<li><b>Politika faizi:</b> Enflasyon/kur vs büyüme/işsizlik. Yüksek borçta etki güçlenir; sermaye kontrolüyle kur etkisi büyür.</li>' +
   '<li><b>Vergi / kamu harcaması:</b> Maliye. Vergi borcu düşürür ama büyümeyi ve onayı yer. Harcama büyütür, borç ve enflasyon üretir.</li>' +
-  '<li><b>Döviz müdahalesi / gölge FX:</b> Kur savunması rezerv yer. Düşük rezerv veya yüksek enflasyonda zayıflar.</li>' +
-  '<li><b>QE:</b> Likidite. Büyüme destek, enflasyon/kur riski. Faiz zaten düşükken büyüme etkisi artar.</li>' +
+  '<li><b>Döviz müdahalesi:</b> Maliyet <b>3</b>. Kur savunması rezerv yer. Her <b>4</b> onaylanan kullanımda siyasi sermaye yenilenmesi −1, −2…; enflasyon ~4 çeyrek gecikmeyle hafif sızar.</li>' +
+  '<li><b>Gölge FX / QE:</b> Gölge FX riskli; QE likidite (büyüme + enflasyon/kur riski).</li>' +
   '<li><b>Sübvansiyon, stok, sermaye kontrolü, tarife, anti-damping, exim:</b> Ticaret ve sanayi taktikleri.</li>' +
   '<li><b>Yaptırım ailesi:</b> İkincil yaptırım, varlık dondurma, servis yasağı, chokepoint, gıda/enerji silahı. ' +
   'Enerji/gıda silahı yalnızca net ihracatçıda tam güç.</li>' +
@@ -45,16 +49,18 @@ GAME.HELP_TOPICS.instruments =
 
   '<h5>4 Slot Kuralı</h5>' +
   '<p>Her tur en fazla 4 farklı enstrüman değişir. Aynı enstrümanı aynı turda iki kez değiştiremezsin ' +
-  '(bekleyen kaydı güncelleyebilirsin, yine 1 slot). Onayla ve İlerle → etkiler uygulanır, AI ülkeler tepki verir.</p>' +
+  '(bekleyen kaydı güncelleyebilirsin, yine 1 slot). <b>Sıfırla</b> (Olay Günlüğü yanı) onay öncesi tüm bekleyenleri iptal eder. ' +
+  'Onayla ve İlerle → özet; siyasi sermaye yetmezse ilerleme <b>engellenir</b>.</p>' +
 
   '<h5>Siyasi Sermaye</h5>' +
-  '<p>Her müdahale maliyet düşer. Onay yükseldikçe sermaye daha hızlı dolar. Sermaye bitince pahalı araçlar kilitlenir. ' +
-  'AI ülkeler de sermaye harcar.</p>';
+  '<p>Her müdahale maliyet düşer. Onay yükseldikçe sermaye daha hızlı dolar. Yetersiz sermaye ile tur onaylanamaz. ' +
+  'AI ülkeler de sermaye harcar. Hover/tooltip anlık maliyeti (escalate / FX penaltı notları ile) gösterir.</p>';
 
 GAME.HELP_TOPICS.countries =
   '<h4>Ülkeler — 17 Güç Rehberi</h4>' +
   '<p>Oyun dünyasında <b>17 oyuncuya açık güç</b> vardır. Avrupa Birliği tek varlık olarak oynanır; ' +
   'İngiltere ayrıdır. Her ülkenin göstergeleri, kişiliği, ticaret ağı, küresel bağımlılıkları ve iç grup güçleri farklıdır.</p>' +
+  '<p><b>Bayraklar:</b> Ülke seçim ve UI’da Win95 çerçeveli PNG bayraklar kullanılır (Windows’ta emoji bayraklar harf çiftine düşmesin diye).</p>' +
 
   '<h5>Göstergeler</h5><ul>' +
   '<li><b>GDP büyüme:</b> Ekonomik canlılık. Düşük/negatif → teşvik baskısı; yüksek → enflasyon riski.</li>' +
@@ -69,7 +75,7 @@ GAME.HELP_TOPICS.countries =
   '<h5>Kişilik (AI)</h5>' +
   '<p><b>aggression</b> misilleme/yaptırım eğilimi; <b>diplomacy</b> swap/yardım ve yumuşak ton; ' +
   '<b>opportunism</b> kriz fırsatçılığı ve gri alan; <b>patience</b> uzun proje başlatma. ' +
-  'Otoriterler gölge FX ve sert misillemeye daha yatkındır. AB <code>birlik</code> tipindedir (demokratik seçim kuralları + yavaş koordinasyon hissi).</p>' +
+  'Otoriterler gölge FX ve sert misillemeye daha yatkındır. AB <code>birlik</code> tipindedir.</p>' +
 
   '<h5>Bağımlılıklar (deps)</h5>' +
   '<p>Petrol/gıda/çip/navlun/dolar endeksine duyarlılık. <b>Negatif</b> = o fiyat yükselince kazanırsın (ihracatçı). ' +
@@ -103,9 +109,10 @@ GAME.HELP_TOPICS.charts =
   '<p>Merkez paneldeki çizgi grafik, seçtiğin göstergenin <b>zaman serisini</b> çizer. ' +
   'Amaç: “faizi artırdım → enflasyon ne zaman düştü?” gibi neden-sonuç okumaktır.</p>' +
 
-  '<h5>Gösterge seçimi</h5>' +
+  '<h5>Gösterge seçimi ve ipuçları</h5>' +
   '<p>Üstteki çipler: GDP büyüme, enflasyon, işsizlik, rezerv, borç, para birimi, ticaret, küresel etki, ' +
-  'onay, istikrar. İyi/kötü yönü renkle ve sol panel oklarıyla da görürsün.</p>' +
+  'onay, istikrar. <b>Masaüstü:</b> çip üzerine gelince kısa “ne / yükselirse / düşerse” ipucu. ' +
+  '<b>Mobil:</b> 1. tık seçim, aynı çipe 2. tık açıklama; dışarı tık kapatır.</p>' +
 
   '<h5>Zaman ölçeği</h5><ul>' +
   '<li><b>1 yıl (4 tur):</b> Acil şoklar, faiz ve kur tepkileri.</li>' +
@@ -138,16 +145,29 @@ GAME.HELP_TOPICS.topics =
   '<p><b>Kazanmak yok.</b> Amaç: bir ekonomik enstrümanı değiştirdiğinde dünyada ne olduğunu hissetmek. ' +
   'Güç, sorumluluk ve “keşke şöyle yapsaydım” meraklısı bir simülasyon. 60 tur ≈ 15 yıl; her tur 1 çeyrek (3 ay).</p>' +
 
-  '<h5>Tur akışı</h5>' +
-  '<ol><li>Sen en fazla 4 bekleyen müdahale seçersin.</li>' +
-  '<li>Onayla ve İlerle → kararların uygulanır, diplomatik tepkiler üretilir.</li>' +
-  '<li>AI ülkeler (karışık sıra, gecikmeli haber) kendi adaylarını skorlayıp uygular.</li>' +
+  '<h5>Tur akışı (v2)</h5>' +
+  '<ol><li>Sen en fazla 4 bekleyen müdahale seçersin (istersen <b>Sıfırla</b> ile iptal).</li>' +
+  '<li>Onayla ve İlerle → özet; sermaye yetmezse engellenir. Evet → kararlar + diplomatik tepkiler.</li>' +
+  '<li>AI ülkeler planlanır, sonra haber akışında <b>chat hızı</b> ayarına göre (yavaş 0,5–2 sn / hızlı 0,2 sn) oynatılır.</li>' +
   '<li>Simülasyon tick: reversion, pulse, sustain, küresel, ticaret, ekonomik bağlar, projeler, iç dinamikler, tespit.</li>' +
   '<li>Haberler, kayıt, tur artışı. Felaket 2–4. turda bir kez tetiklenir.</li></ol>' +
+  '<p>Sayfa yenilenirse yarım tur <b>baştan</b> oynatılır (plan-replay modeli).</p>' +
+
+  '<h5>Olay akışı (chat) ve sözlük</h5>' +
+  '<p>Sağ panel mIRC tarzı kanallar. Yıldızlı (<b>*</b>) terimler: masaüstünde hover ile gri açıklama; ' +
+  'satıra tık = sade dil özeti. Masaüstünde satır üzerinde imleç yanı ipucu; <b>mobilde</b> beyaz satır ipucu yok. ' +
+  '“Bir daha gösterme” kalıcıdır (Ayarlar’dan sıfırlanabilir).</p>' +
+
+  '<h5>Ayarlar (ana menü)</h5>' +
+  '<ul>' +
+  '<li><b>Dil / ses:</b> TR-EN; sessiz / %40 / %100 (tercih tarayıcıda kalır).</li>' +
+  '<li><b>Chat hızı:</b> Yavaş (varsayılan) veya Hızlı (ülke başına 0,2 sn).</li>' +
+  '<li><b>Gelişmiş ayarlar (masaüstü):</b> Excel benzeri tablo — oyun/enstrüman/ülke sabitleri; mobilde gizli.</li>' +
+  '</ul>' +
 
   '<h5>Etki zaman ölçekleri</h5>' +
   '<p>imm (0 gecikme / 2 tur), short (1/4), med (4/10), long (12/24). Pulse toplam etki bu süreye bölünür. ' +
-  'Sustain her çeyrek seviye×m ekler. Mean reversion sınırsız birikimi engeller (büyüme hızlı, borç yavaş döner).</p>' +
+  'Sustain her çeyrek seviye×m ekler. Mean reversion sınırsız birikimi engeller.</p>' +
 
   '<h5>Çapraz çarpanlar</h5>' +
   '<p>Yüksek borç × faiz; sermaye kontrolü × faiz-kur; düşük rezerv × FX; felaket × stok; ' +
@@ -156,30 +176,21 @@ GAME.HELP_TOPICS.topics =
 
   '<h5>İç dinamikler</h5>' +
   '<p>6 grup (iş dünyası, emek, milliyetçi, liberal, kırsal, bürokrasi). Enstrüman groups etkileri + ekonomik koşullar ' +
-  'memnuniyeti değiştirir. Onay = ağırlıklı ortalama; istikrar kutuplaşma/radikalizm/işsizlik/enflasyona bağlı. ' +
-  'Protesto, grev, seçim baskısı, hükümet değişikliği (demokratik/birlik), otoriter sıkılaşma olabilir.</p>' +
+  'memnuniyeti değiştirir. Onay = ağırlıklı ortalama; istikrar kutuplaşma/radikalizm/işsizlik/enflasyona bağlı.</p>' +
 
-  '<h5>Diplomasi ve ton</h5>' +
-  '<p>5 ton: dostane → düşmanca. İlişki, eylem şiddeti, gözlemci kişiliği ve self-impact hesaplanır. ' +
-  'Sert tonlar ilişkiyi daha da bozar. Haritada tıkla: ülke bilgisi + ticaret hatları.</p>' +
-
-  '<h5>Harita navigasyonu</h5>' +
-  '<p>Google Haritalar tarzı: sürükle = kaydır, tekerlek = zoom, çift tık = yaklaş, +/−/⌂ düğmeleri. ' +
-  'Ülke sınırına tıkla = o ülkenin paneline geç.</p>' +
-
-  '<h5>AI</h5>' +
-  '<p>Skor tabanlı adaylar: öz-bakım, felaket savunması, oyuncu misillemesi, projeler, fırsatçı agresyon. ' +
-  'Krizde 3, normalde 2 eylem. Danışma Kurulu aynı motoru senin için çalıştırır.</p>' +
+  '<h5>Diplomasi, harita, AI</h5>' +
+  '<p>5 ton: dostane → düşmanca. Harita: sürükle/zoom; ilişki renkli çizgiler; AB marker İspanya. ' +
+  'AI skor tabanlı; krizde 3, normalde 2 eylem. Danışma Kurulu aynı motoru senin için çalıştırır.</p>' +
 
   '<h5>Kayıt</h5>' +
-  '<p>localStorage anahtarı <code>kureselEtkiSave_oyungrok</code> (eski /oyun/ sürümünden ayrı). ' +
-  'Her tur otomatik kayıt. Eski kayıtlar yeni enstrüman/ülke setiyle uyumsuz olabilir → Yeni Oyun önerilir.</p>' +
+  '<p>localStorage anahtarları <code>*_oyungrok</code> sonekli (eski /oyun/ ile karışmaz). ' +
+  'Tam tur bitince kalıcı kayıt; yarım tur job ayrı tutulur. Ayarlar / dil / tunables ayrı anahtarlarda.</p>' +
 
   '<h5>Oyun sonu skorları</h5>' +
-  '<p>Ülke performansı, küresel istikrar, miras (kalıcı değişim sayısı), proje tutarlılığı, risk (tespit/misilleme). ' +
-  'Hepsi 0–100’e sıkıştırılır; “kazanma” değil değerlendirme panosudur.</p>';
+  '<p>Ülke performansı, küresel istikrar, miras, proje tutarlılığı, risk (tespit). ' +
+  'Hepsi 0–100; “kazanma” değil değerlendirme panosudur.</p>';
 
-/* Ana menü “Nasıl Oynanır” özet metni (detaylı) */
+/* Ana menü “Nasıl Oynanır” özet metni */
 GAME.ABOUT_MAIN_HTML =
   '<h4>Misyon</h4>' +
   '<p><b>Küresel Etki</b>, klasik “kazan-kaybet” oyunu değildir. Büyük bir küresel felaket sonrası seçtiğin ülkeyi ' +
@@ -189,24 +200,27 @@ GAME.ABOUT_MAIN_HTML =
 
   '<h4>Temel kurallar</h4><ul>' +
   '<li><b>Tur = 3 ay.</b> Oyun 60 tur (≈15 yıl) sürer.</li>' +
-  '<li><b>4 slot:</b> Her tur en fazla 4 enstrüman değişikliği. Sürdürmek ücretsizdir.</li>' +
-  '<li><b>Siyasi sermaye:</b> Müdahaleler maliyetlidir; toplum onayı sermayeyi yeniler.</li>' +
-  '<li><b>17 ülke:</b> AB tek varlık, İngiltere ayrı. AI ülkeler senin hamlelerine tepki verir.</li>' +
-  '<li><b>1 felaket:</b> 2–4. turda rastgele tetiklenir; şiddet ülkeye göre değişir.</li>' +
+  '<li><b>4 slot:</b> Her tur en fazla 4 enstrüman değişikliği. Sürdürmek ücretsizdir. Onay öncesi <b>Sıfırla</b> ile bekleyenleri iptal edebilirsin.</li>' +
+  '<li><b>Siyasi sermaye:</b> Müdahaleler maliyetlidir; onay yeniler. Yetersizse tur onaylanamaz.</li>' +
+  '<li><b>Makro maliyet artışı:</b> Faiz, vergi, kamu harcaması taban 2 + her onayda +1. Döviz müdahalesi maliyet 3; aşırı kullanım regen cezası ve gecikmeli enflasyon.</li>' +
+  '<li><b>17 ülke:</b> AB tek varlık, İngiltere ayrı; PNG bayraklı seçim ekranı. AI tepki verir.</li>' +
+  '<li><b>1 felaket:</b> 2–4. turda rastgele; şiddet ülkeye göre değişir.</li>' +
   '<li><b>Gri alan riski:</b> Örtülü operasyonlar tespit edilebilir → skandal + misilleme.</li></ul>' +
 
   '<h4>Arayüz haritası</h4><ul>' +
-  '<li><b>Sol üst ülke şeridi:</b> İlişki renkli kısa adlar; tıkla → dünya haritası (sürükle/zoom).</li>' +
+  '<li><b>Ana menü Ayarlar:</b> dil, ses, chat hızı (yavaş/hızlı), gelişmiş sabitler (masaüstü).</li>' +
+  '<li><b>Sol üst ülke şeridi:</b> Bayrak + kısa ad, ilişki rengi; tıkla → harita.</li>' +
   '<li><b>Sol panel:</b> Göstergeler, iç gruplar, aktif politikalar.</li>' +
-  '<li><b>Merkez:</b> Zaman serisi grafikleri.</li>' +
-  '<li><b>Sağ:</b> mIRC tarzı olay akışı (#ekonomi, #diplomasi…).</li>' +
-  '<li><b>Alt:</b> 4 katmanlı enstrüman menüsü — ekran genişliğine göre <b>sayfalı</b> (kaydırma yok).</li>' +
-  '<li><b>❓ Yardım:</b> Danışma Kurulu önerileri + ansiklopedi butonları.</li></ul>' +
+  '<li><b>Merkez:</b> Zaman serisi grafikleri (çiplerde hover/tık ipucu).</li>' +
+  '<li><b>Sağ:</b> mIRC olay akışı; yıldızlı (*) terim sözlüğü + satıra tık sade dil.</li>' +
+  '<li><b>Alt:</b> 4 katmanlı enstrüman menüsü — masaüstünde sayfalı.</li>' +
+  '<li><b>❓ Yardım:</b> Danışma Kurulu + ansiklopedi.</li></ul>' +
 
   '<h4>Strateji ipuçları</h4><ul>' +
   '<li>Krizde önce makro (faiz, stok, rezerv); sakin dönemde yapısal proje.</li>' +
   '<li>Yaptırım misilleme doğurur; müttefiklere swap/yardım ilişki kazanır.</li>' +
   '<li>Grafikte 1–3 yıl ölçeğini izle — etkiler gecikmeli gelir.</li>' +
+  '<li>Sık faiz/vergi/harcama kullanımı siyasi sermayeyi hızla tüketir (escalate).</li>' +
   '<li>Her karar bir seçimdir: 4 kötü slot, felaketi büyütür.</li></ul>' +
 
   '<p style="margin-top:12px;color:#505050"><b>Alttaki butonlardan</b> enstrümanlar, ülkeler, grafikler ve sistem ' +
