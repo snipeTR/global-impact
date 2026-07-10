@@ -218,6 +218,8 @@ document.addEventListener('DOMContentLoaded', function () {
   /* Gelişmiş sabitler (localStorage override) */
   if (typeof GAME.applyStoredTunables === 'function') GAME.applyStoredTunables();
 
+  /* Ses tercihi (mute/%40/%100) ayarlardan — unlock/play öncesi */
+  if (GAME.Music && GAME.Music.loadVolumeFromSettings) GAME.Music.loadVolumeFromSettings();
   if (GAME.Music && GAME.Music.bindUnlockOnce) GAME.Music.bindUnlockOnce();
   if (GAME.Music && GAME.Music.bindButtons) GAME.Music.bindButtons();
 

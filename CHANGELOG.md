@@ -13,6 +13,15 @@ _(Boş — sıradaki iş buraya)_
 
 ---
 
+## 2026-07-10 — Mute: ayarlardan kapatınca yeni oyunda müzik susmuyor
+
+- Kök neden: `Music.unlock()` async olarak eski `prev` sesini geri yüklüyordu; buton mute iken element sesi açılıyordu.
+- `applyVolumeToAudio` + `a.muted`; fade/play mute’u ezerse hemen hedef basamağa kilitle.
+- Ses basamağı `keSettings_oyungrok` (`volStep`/`volume`) ile kalıcı; sayfa açılışı ve `onGameStart` okur.
+- `cycleVolume` tercihi kaydeder.
+
+---
+
 ## 2026-07-10 — Güvenlik denetimi + README/CHANGELOG senkronu
 
 ### Sızıntı taraması (public `global-impact`)

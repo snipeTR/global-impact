@@ -119,7 +119,7 @@ ekonomi oyunu/
 | `kureselEtkiTurnJob_oyungrok` | Yarım tur script (`complete:false`) |
 | `keFeedCollapsed_oyungrok` | Feed daraltma |
 | `keLang_oyungrok` | Dil tercihi (`tr` / `en`) |
-| `keSettings_oyungrok` | Ayarlar paneli (ses, onay, feed varsayılanı) |
+| `keSettings_oyungrok` | Ayarlar paneli (`volStep`/`volume`, onay, feed varsayılanı) |
 | `keTunables_oyungrok` | Gelişmiş ayarlar — oyun/enstrüman/ülke sabitleri |
 | `keGlossSkip_oyungrok` | Haber sözlüğü “bir daha gösterme” (kalıcı) |
 

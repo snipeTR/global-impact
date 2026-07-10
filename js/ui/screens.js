@@ -17,11 +17,12 @@ GAME.renderMenu = function () {
 /* ---- Ayarlar (kalıcı localStorage) ---- */
 GAME.SETTINGS_KEY = 'keSettings_oyungrok';
 GAME.loadSettings = function () {
+  const defaults = { confirmNew: true, feedCollapsedDefault: false, volStep: 1, volume: 0.4 };
   try {
     const raw = localStorage.getItem(GAME.SETTINGS_KEY);
-    if (!raw) return { confirmNew: true, feedCollapsedDefault: false };
-    return Object.assign({ confirmNew: true, feedCollapsedDefault: false }, JSON.parse(raw));
-  } catch (e) { return { confirmNew: true, feedCollapsedDefault: false }; }
+    if (!raw) return Object.assign({}, defaults);
+    return Object.assign({}, defaults, JSON.parse(raw));
+  } catch (e) { return Object.assign({}, defaults); }
 };
 GAME.saveSettings = function (s) {
   try { localStorage.setItem(GAME.SETTINGS_KEY, JSON.stringify(s || GAME.loadSettings())); } catch (e) {}
