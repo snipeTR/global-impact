@@ -13,6 +13,14 @@ _(Boş — sıradaki iş buraya)_
 
 ---
 
+## 2026-07-10 — Grafik çip ipuçları + sözlük popover UX
+
+- Grafik butonları (büyüme, enflasyon, rezerv, gıda…): hover’da “ne / yükselirse / düşerse” 1’er cümle (TR+EN).
+- Sözlük popover: **Kapat** butonu kaldırıldı; tık (mesaj/popover) veya mouse leave ile kapanır.
+- “Bu açıklamayı bir daha gösterme” checkbox → `localStorage keGlossSkip_oyungrok` (oyuna özel değil, kalıcı).
+
+---
+
 ## 2026-07-10 — Dünya olayları ekonomi sözlüğü (* terimler)
 
 - `js/data/glossary.js`: TR/EN sade dil sözlüğü (enflasyon, rezerv, yaptırım, QE…).

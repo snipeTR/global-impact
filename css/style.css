@@ -288,12 +288,31 @@ body.viewport-blocked .screen{visibility:hidden; pointer-events:none;}
 }
 .glossary-pop .gpop-body{margin-bottom:4px;}
 .glossary-pop .gpop-hint{font-size:10px; color:var(--dim); margin-top:6px;}
-.glossary-pop .gpop-close{text-align:right; margin-top:6px;}
+.glossary-pop .gpop-mute{
+  display:flex; align-items:flex-start; gap:6px;
+  margin-top:8px; padding-top:6px; border-top:1px dotted #808080;
+  font-size:11px; color:var(--dim); cursor:pointer; user-select:none;
+}
+.glossary-pop .gpop-mute input{ margin-top:2px; flex:0 0 auto; }
 body.mobile-ui .glossary-pop{
   max-width:94vw !important; max-height:42vh;
   font-size:13px; line-height:1.5;
 }
 body.mobile-ui .econ-term{ border-bottom-width:2px; padding:0 1px; }
+
+/* Grafik çip hover ipucu */
+.chart-chip-tip{
+  background:var(--face); color:var(--text);
+  border:2px solid; border-color:#ffffff #404040 #404040 #ffffff;
+  box-shadow:3px 3px 0 rgba(0,0,0,.3);
+  padding:8px 10px; font-size:11px; line-height:1.45;
+  max-width:320px; pointer-events:none;
+}
+.chart-chip-tip.hidden{display:none !important;}
+.chart-chip-tip .cct-row{margin-bottom:4px;}
+.chart-chip-tip .cct-up b{color:#008000;}
+.chart-chip-tip .cct-dn b{color:#c00000;}
+body.mobile-ui .chart-chip-tip{ max-width:90vw; font-size:12px; }
 .irc-time{color:#808080;}
 .irc-nick{font-weight:bold;}
 .irc-status-line{color:#008000;}

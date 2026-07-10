@@ -164,6 +164,135 @@ GAME.drawChart = function () {
   ctx.fillText(name + ' — ' + GAME.fmt(lastV, 1), PAD.l, H < 180 ? 14 : 18);
 };
 
+/* Grafik butonu hover: ne gösterir / yükselir / düşer (TR+EN) */
+GAME.CHART_TIPS = {
+  tr: {
+    growth: {
+      what: 'Ülkenin ekonomik temposunu (üretim/gelir artışı) gösterir.',
+      up: 'Yükselirse ekonomi canlanıyor demektir; genelde iş ve gelir umudu artar.',
+      down: 'Düşerse ekonomi yavaşlıyor veya küçülüyor; işsizlik baskısı büyüyebilir.'
+    },
+    inflation: {
+      what: 'Fiyatların ne kadar hızlı arttığını gösterir.',
+      up: 'Yükselirse aynı parayla daha az şey alırsın; hayat pahalılaşır.',
+      down: 'Düşerse fiyat baskısı hafifler; alım gücü genelde rahatlar.'
+    },
+    currency: {
+      what: 'Paranın dışarıdaki gücünü (kur endeksi) gösterir; 100 başlangıçtır.',
+      up: 'Yükselirse para güçlenir; ithalat görece ucuzlar.',
+      down: 'Düşerse para zayıflar; ithalat ve enflasyon baskısı artabilir.'
+    },
+    trade: {
+      what: 'İhracat ile ithalat farkını (dış ticaret dengesi) gösterir.',
+      up: 'Yükselirse dışarıya net satış artar; döviz kazanmak kolaylaşır.',
+      down: 'Düşerse net ithalat artar; döviz ve rezerv baskısı gelebilir.'
+    },
+    debt: {
+      what: 'Devletin borç yükünü (GSYH’ye oran) gösterir.',
+      up: 'Yükselirse bütçe nefesi daralır; faiz ve vergi baskısı artabilir.',
+      down: 'Düşerse mali alan genişler; kriz manevrası kolaylaşır.'
+    },
+    reserves: {
+      what: 'Döviz ve likit “yedek kasa”yı gösterir.',
+      up: 'Yükselirse kur savunması ve ithalat için tampon güçlenir.',
+      down: 'Düşerse kriz anında manevra alanı daralır; spekülatif baskı artabilir.'
+    },
+    stability: {
+      what: 'İç düzen ve toplumsal sakinlik skorunu gösterir.',
+      up: 'Yükselirse protesto/kriz riski azalır; politika yapmak kolaylaşır.',
+      down: 'Düşerse sokak gerilimi ve siyasi kriz ihtimali artar.'
+    },
+    influence: {
+      what: 'Ülkenin dünya sahnesindeki ağırlığını gösterir.',
+      up: 'Yükselirse yaptırım, standart ve diplomasi gücü artar.',
+      down: 'Düşerse sesin zayıflar; rakiplerin dayatması artabilir.'
+    },
+    'g:oil': {
+      what: 'Küresel petrol fiyat endeksini gösterir (100 = oyun başı).',
+      up: 'Yükselirse enerji pahalılaşır; ithalatçı enflasyon baskısı, ihracatçı kazanç görür.',
+      down: 'Düşerse enerji ucuzlar; üretici ülkeler gelir kaybı yaşayabilir.'
+    },
+    'g:food': {
+      what: 'Küresel gıda fiyat endeksini gösterir.',
+      up: 'Yükselirse market sepeti pahalılaşır; toplumsal gerilim artabilir.',
+      down: 'Düşerse gıda rahatlar; tarım ihracatçısı zorlanabilir.'
+    },
+    'g:dollar': {
+      what: 'Doların diğer paralara göre gücünü gösterir.',
+      up: 'Yükselirse dolarla borçlu ülkeler ve emtia fiyatları sarsılabilir.',
+      down: 'Düşerse dolar zayıflar; emtia ve yükselen piyasalar genelde ferahlar.'
+    }
+  },
+  en: {
+    growth: {
+      what: 'Shows the pace of the economy (output/income growth).',
+      up: 'Rising means the economy is picking up; jobs and incomes often improve.',
+      down: 'Falling means the economy is slowing or shrinking; unemployment pressure may rise.'
+    },
+    inflation: {
+      what: 'Shows how fast overall prices are rising.',
+      up: 'Rising means your money buys less; living costs climb.',
+      down: 'Falling eases price pressure; purchasing power usually improves.'
+    },
+    currency: {
+      what: 'Shows the strength of the currency (index; 100 = start).',
+      up: 'Rising means a stronger currency; imports get relatively cheaper.',
+      down: 'Falling means a weaker currency; imports and inflation pressure can rise.'
+    },
+    trade: {
+      what: 'Shows exports minus imports (trade balance).',
+      up: 'Rising means more net sales abroad; easier to earn foreign currency.',
+      down: 'Falling means more net imports; pressure on FX and reserves can grow.'
+    },
+    debt: {
+      what: 'Shows the government debt burden (% of GDP).',
+      up: 'Rising squeezes the budget; interest and tax pressure may grow.',
+      down: 'Falling frees fiscal space; crisis maneuvering gets easier.'
+    },
+    reserves: {
+      what: 'Shows the FX/liquid “rainy-day” stash.',
+      up: 'Rising strengthens the buffer for currency defense and imports.',
+      down: 'Falling shrinks crisis room; speculative pressure can rise.'
+    },
+    stability: {
+      what: 'Shows domestic order and social calm.',
+      up: 'Rising lowers unrest risk; policy is easier to run.',
+      down: 'Falling raises protest and political-crisis odds.'
+    },
+    influence: {
+      what: 'Shows the country’s weight on the world stage.',
+      up: 'Rising boosts sanctions, standards and diplomatic clout.',
+      down: 'Falling weakens your voice; rivals can push harder.'
+    },
+    'g:oil': {
+      what: 'Global oil price index (100 = game start).',
+      up: 'Rising makes energy costlier; importers feel inflation, exporters gain.',
+      down: 'Falling cheapens energy; producer countries may lose income.'
+    },
+    'g:food': {
+      what: 'Global food price index.',
+      up: 'Rising fills grocery baskets with higher prices; social tension can rise.',
+      down: 'Falling eases food costs; farm exporters may struggle.'
+    },
+    'g:dollar': {
+      what: 'Strength of the dollar vs other major currencies.',
+      up: 'Rising can squeeze dollar debtors and commodity prices.',
+      down: 'Falling weakens the dollar; commodities and emerging markets often ease.'
+    }
+  }
+};
+
+GAME.chartTipText = function (id) {
+  const lang = (GAME.i18n && GAME.i18n.getLang && GAME.i18n.getLang()) || 'tr';
+  const pack = (GAME.CHART_TIPS && (GAME.CHART_TIPS[lang] || GAME.CHART_TIPS.tr)) || {};
+  const tip = pack[id];
+  if (!tip) return '';
+  const L = lang === 'en'
+    ? { w: 'Shows', u: 'Rising', d: 'Falling' }
+    : { w: 'Ne', u: 'Yükselirse', d: 'Düşerse' };
+  return L.w + ': ' + tip.what + ' ' + L.u + ': ' + tip.up + ' ' + L.d + ': ' + tip.down;
+};
+
 /* Grafik kontrol çipleri */
 GAME.renderChartControls = function () {
   const indBox = document.getElementById('chart-ind-buttons');
@@ -173,7 +302,14 @@ GAME.renderChartControls = function () {
     const b = document.createElement('button');
     b.className = 'chip' + (GAME.chart.indicator === sr.id ? ' active' : '');
     b.textContent = sr.name;
-    b.onclick = () => { GAME.chart.indicator = sr.id; GAME.renderChartControls(); GAME.drawChart(); };
+    const tip = GAME.chartTipText(sr.id);
+    if (tip) {
+      b.title = tip;
+      b.setAttribute('aria-label', sr.name + '. ' + tip);
+      b.onmouseenter = (e) => GAME.showChartChipTip(sr.id, b, e);
+      b.onmouseleave = () => GAME.hideChartChipTip();
+    }
+    b.onclick = () => { GAME.chart.indicator = sr.id; GAME.hideChartChipTip(); GAME.renderChartControls(); GAME.drawChart(); };
     indBox.appendChild(b);
   });
   [['1y', 'ui.range_1y'], ['3y', 'ui.range_3y'], ['5y', 'ui.range_5y'], ['10y', 'ui.range_10y'], ['all', 'ui.range_all']].forEach(([id, labelKey]) => {
@@ -184,4 +320,46 @@ GAME.renderChartControls = function () {
     b.onclick = () => { GAME.chart.range = id; GAME.renderChartControls(); GAME.drawChart(); };
     rngBox.appendChild(b);
   });
+};
+
+GAME._chartTipEl = null;
+GAME.showChartChipTip = function (id, anchor, e) {
+  const lang = (GAME.i18n && GAME.i18n.getLang && GAME.i18n.getLang()) || 'tr';
+  const pack = (GAME.CHART_TIPS && (GAME.CHART_TIPS[lang] || GAME.CHART_TIPS.tr)) || {};
+  const tip = pack[id];
+  if (!tip) return;
+  let el = GAME._chartTipEl;
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'chart-chip-tip';
+    el.className = 'chart-chip-tip';
+    document.body.appendChild(el);
+    GAME._chartTipEl = el;
+  }
+  const L = lang === 'en'
+    ? { w: 'What it shows', u: 'If rising', d: 'If falling' }
+    : { w: 'Ne gösterir', u: 'Yükselirse', d: 'Düşerse' };
+  el.innerHTML =
+    '<div class="cct-row"><b>' + L.w + ':</b> ' + tip.what + '</div>' +
+    '<div class="cct-row cct-up"><b>' + L.u + ':</b> ' + tip.up + '</div>' +
+    '<div class="cct-row cct-dn"><b>' + L.d + ':</b> ' + tip.down + '</div>';
+  el.classList.remove('hidden');
+  const pad = 8;
+  const r = anchor.getBoundingClientRect();
+  el.style.position = 'fixed';
+  el.style.zIndex = '280';
+  el.style.left = '0px';
+  el.style.top = '0px';
+  const er = el.getBoundingClientRect();
+  let left = r.left;
+  let top = r.bottom + 6;
+  if (left + er.width > window.innerWidth - pad) left = window.innerWidth - er.width - pad;
+  if (top + er.height > window.innerHeight - pad) top = r.top - er.height - 6;
+  if (left < pad) left = pad;
+  if (top < pad) top = pad;
+  el.style.left = left + 'px';
+  el.style.top = top + 'px';
+};
+GAME.hideChartChipTip = function () {
+  if (GAME._chartTipEl) GAME._chartTipEl.classList.add('hidden');
 };

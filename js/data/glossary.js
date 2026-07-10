@@ -350,11 +350,49 @@ GAME.findGlossaryHits = function (raw) {
   return hits;
 };
 
-/** Metni güvenli HTML'e çevir; terimlere * ve tıklanabilir span ekle */
+/* Kalıcı “bir daha gösterme” — localStorage (oyuna özel değil) */
+GAME.GLOSS_SKIP_KEY = 'keGlossSkip_oyungrok';
+GAME.loadGlossSkip = function () {
+  try {
+    const raw = localStorage.getItem(GAME.GLOSS_SKIP_KEY);
+    if (!raw) return { terms: {}, lines: {} };
+    const o = JSON.parse(raw);
+    return { terms: o.terms || {}, lines: o.lines || {} };
+  } catch (e) { return { terms: {}, lines: {} }; }
+};
+GAME.saveGlossSkip = function (data) {
+  try { localStorage.setItem(GAME.GLOSS_SKIP_KEY, JSON.stringify(data || { terms: {}, lines: {} })); } catch (e) {}
+};
+GAME.glossLineId = function (raw) {
+  let h = 0;
+  const s = String(raw || '');
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return 'L' + (h >>> 0).toString(16);
+};
+GAME.isGlossTermMuted = function (key) {
+  if (!key) return false;
+  return !!GAME.loadGlossSkip().terms[String(key).toLowerCase()];
+};
+GAME.isGlossLineMuted = function (raw) {
+  if (!raw) return false;
+  return !!GAME.loadGlossSkip().lines[GAME.glossLineId(raw)];
+};
+GAME.muteGlossTerm = function (key) {
+  const d = GAME.loadGlossSkip();
+  d.terms[String(key).toLowerCase()] = 1;
+  GAME.saveGlossSkip(d);
+};
+GAME.muteGlossLine = function (raw) {
+  const d = GAME.loadGlossSkip();
+  d.lines[GAME.glossLineId(raw)] = 1;
+  GAME.saveGlossSkip(d);
+};
+
+/** Metni güvenli HTML'e çevir; terimlere * ve tıklanabilir span ekle (muted hariç) */
 GAME.annotateGlossaryText = function (raw) {
   const text = String(raw || '');
   if (!text) return '';
-  const hits = GAME.findGlossaryHits(text);
+  const hits = GAME.findGlossaryHits(text).filter(h => !GAME.isGlossTermMuted(h.key));
   if (!hits.length) return GAME.escapeHtml(text);
 
   let html = '';
@@ -363,19 +401,18 @@ GAME.annotateGlossaryText = function (raw) {
     if (h.start > cursor) html += GAME.escapeHtml(text.slice(cursor, h.start));
     const termHtml = GAME.escapeHtml(h.surface) + '*';
     html += '<span class="econ-term" tabindex="0" role="button" data-g-idx="' + idx + '" data-g-key="' +
-      GAME.escapeHtml(h.key) + '" data-g-explain="' + GAME.escapeHtml(h.explain) + '" title="' +
-      GAME.escapeHtml(h.explain) + '">' + termHtml + '</span>';
+      GAME.escapeHtml(h.key) + '" data-g-explain="' + GAME.escapeHtml(h.explain) + '">' + termHtml + '</span>';
     cursor = h.end;
   });
   if (cursor < text.length) html += GAME.escapeHtml(text.slice(cursor));
   return html;
 };
 
-/** Satırdaki tüm terimlerden sade dil özeti */
+/** Satırdaki tüm terimlerden sade dil özeti (muted terimler çıkar) */
 GAME.plainExplainLine = function (raw) {
-  const hits = GAME.findGlossaryHits(raw);
+  const hits = GAME.findGlossaryHits(raw).filter(h => !GAME.isGlossTermMuted(h.key));
   const t = (k, v) => (GAME.t ? GAME.t(k, v) : k);
-  if (!hits.length) return t('ui.glossary_none') || 'Bu satırda özel ekonomi terimi işaretlenmedi.';
+  if (!hits.length) return null;
   const seen = {};
   const parts = [];
   hits.forEach(h => {
@@ -389,6 +426,7 @@ GAME.plainExplainLine = function (raw) {
 };
 
 GAME._glossaryPopEl = null;
+GAME._glossaryPopMeta = null;
 GAME.ensureGlossaryPop = function () {
   if (GAME._glossaryPopEl) return GAME._glossaryPopEl;
   const el = document.createElement('div');
@@ -397,6 +435,7 @@ GAME.ensureGlossaryPop = function () {
   el.setAttribute('role', 'tooltip');
   document.body.appendChild(el);
   GAME._glossaryPopEl = el;
+  el.addEventListener('mouseleave', function () { GAME.hideGlossaryPop(); });
   return el;
 };
 
@@ -404,18 +443,38 @@ GAME.hideGlossaryPop = function () {
   const el = GAME.ensureGlossaryPop();
   el.classList.add('hidden');
   el.innerHTML = '';
+  GAME._glossaryPopMeta = null;
 };
 
-GAME.showGlossaryPop = function (html, anchorEl, clientX, clientY) {
-  const el = GAME.ensureGlossaryPop();
-  el.innerHTML = html +
-    '<div class="gpop-close"><button type="button" class="btn btn-small gpop-x">' +
-    (GAME.t ? GAME.t('ui.close_modal') : 'Kapat') + '</button></div>';
-  el.classList.remove('hidden');
-  const xBtn = el.querySelector('.gpop-x');
-  if (xBtn) xBtn.onclick = function (e) { e.stopPropagation(); GAME.hideGlossaryPop(); };
+/** meta: { type:'term'|'line', key?, raw? } — kapat butonu yok; tick = bir daha gösterme */
+GAME.showGlossaryPop = function (html, anchorEl, clientX, clientY, meta) {
+  if (meta && meta.type === 'term' && GAME.isGlossTermMuted(meta.key)) return;
+  if (meta && meta.type === 'line' && GAME.isGlossLineMuted(meta.raw)) return;
 
-  // Konum: mobilde altta geniş; masaüstünde imleç/anchor yanında
+  const el = GAME.ensureGlossaryPop();
+  const t = (k) => (GAME.t ? GAME.t(k) : k);
+  const muteId = 'gpop-mute-' + Date.now();
+  el.innerHTML = html +
+    '<label class="gpop-mute" for="' + muteId + '">' +
+    '<input type="checkbox" id="' + muteId + '"> ' +
+    (t('ui.glossary_dont_show') || 'Bu açıklamayı bir daha gösterme') +
+    '</label>';
+  el.classList.remove('hidden');
+  GAME._glossaryPopMeta = meta || null;
+
+  const cb = el.querySelector('#' + muteId);
+  if (cb) {
+    cb.onclick = function (e) { e.stopPropagation(); };
+    cb.onchange = function () {
+      if (!cb.checked || !GAME._glossaryPopMeta) return;
+      const m = GAME._glossaryPopMeta;
+      if (m.type === 'term' && m.key) GAME.muteGlossTerm(m.key);
+      if (m.type === 'line' && m.raw) GAME.muteGlossLine(m.raw);
+      GAME.hideGlossaryPop();
+      if (typeof GAME.renderFeed === 'function' && GAME.state) GAME.renderFeed();
+    };
+  }
+
   const pad = 8;
   const vw = window.innerWidth;
   const vh = window.innerHeight;
@@ -424,7 +483,6 @@ GAME.showGlossaryPop = function (html, anchorEl, clientX, clientY) {
   el.style.maxWidth = (vw < 520 ? Math.min(vw - 16, 360) : 380) + 'px';
   el.style.left = '0px';
   el.style.top = '0px';
-  // measure
   const rect = el.getBoundingClientRect();
   let left, top;
   if (vw < 520) {
@@ -449,26 +507,26 @@ GAME.bindGlossaryUiOnce = function () {
   GAME._glossaryBound = true;
 
   const onTermEnter = function (e) {
-    const t = e.target.closest('.econ-term');
-    if (!t) return;
-    if (window.innerWidth < 520) return; // mobilde hover yok; tık kullan
-    const explain = t.getAttribute('data-g-explain') || '';
-    const key = t.getAttribute('data-g-key') || t.textContent;
+    const term = e.target.closest('.econ-term');
+    if (!term) return;
+    if (window.innerWidth < 520) return;
+    const key = term.getAttribute('data-g-key') || '';
+    if (GAME.isGlossTermMuted(key)) return;
+    const explain = term.getAttribute('data-g-explain') || '';
     const html = '<div class="gpop-title">' + GAME.escapeHtml(key) + '</div>' +
       '<div class="gpop-body">' + GAME.escapeHtml(explain) + '</div>';
-    GAME.showGlossaryPop(html, t, e.clientX, e.clientY);
+    GAME.showGlossaryPop(html, term, e.clientX, e.clientY, { type: 'term', key: key });
   };
   const onTermLeave = function (e) {
     if (window.innerWidth < 520) return;
     const to = e.relatedTarget;
-    if (to && (to.closest && (to.closest('#glossary-pop') || to.closest('.econ-term')))) return;
-    // küçük gecikme: popover'a geçiş
+    if (to && to.closest && (to.closest('#glossary-pop') || to.closest('.econ-term'))) return;
     setTimeout(function () {
       const pop = GAME._glossaryPopEl;
       if (pop && !pop.matches(':hover') && !document.querySelector('.econ-term:hover')) {
         GAME.hideGlossaryPop();
       }
-    }, 120);
+    }, 80);
   };
 
   document.addEventListener('mouseover', function (e) {
@@ -479,26 +537,41 @@ GAME.bindGlossaryUiOnce = function () {
   });
 
   document.addEventListener('click', function (e) {
+    if (e.target.closest && e.target.closest('#glossary-pop')) {
+      if (e.target.closest('.gpop-mute')) return;
+      GAME.hideGlossaryPop();
+      return;
+    }
     const term = e.target.closest && e.target.closest('.econ-term');
     if (term) {
       e.preventDefault();
       e.stopPropagation();
+      const key = term.getAttribute('data-g-key') || '';
+      if (GAME.isGlossTermMuted(key)) return;
       const explain = term.getAttribute('data-g-explain') || '';
-      const key = term.getAttribute('data-g-key') || term.textContent;
       const html = '<div class="gpop-title">' + GAME.escapeHtml(key) + '</div>' +
         '<div class="gpop-body">' + GAME.escapeHtml(explain) + '</div>' +
         '<div class="gpop-hint">' + (GAME.t ? GAME.t('ui.glossary_term_hint') : '') + '</div>';
-      GAME.showGlossaryPop(html, term, e.clientX, e.clientY);
+      GAME.showGlossaryPop(html, term, e.clientX, e.clientY, { type: 'term', key: key });
       return;
     }
     const line = e.target.closest && e.target.closest('.irc-line[data-g-raw]');
     if (line && !e.target.closest('.econ-term')) {
       e.preventDefault();
       const raw = line.getAttribute('data-g-raw') || '';
-      GAME.showGlossaryPop(GAME.plainExplainLine(raw), line, e.clientX, e.clientY);
+      if (GAME._glossaryPopMeta && GAME._glossaryPopMeta.type === 'line' &&
+          GAME._glossaryPopMeta.raw === raw && GAME._glossaryPopEl &&
+          !GAME._glossaryPopEl.classList.contains('hidden')) {
+        GAME.hideGlossaryPop();
+        return;
+      }
+      if (GAME.isGlossLineMuted(raw)) return;
+      const body = GAME.plainExplainLine(raw);
+      if (!body) return;
+      GAME.showGlossaryPop(body, line, e.clientX, e.clientY, { type: 'line', raw: raw });
       return;
     }
-    if (!e.target.closest('#glossary-pop')) GAME.hideGlossaryPop();
+    GAME.hideGlossaryPop();
   });
 
   document.addEventListener('keydown', function (e) {
