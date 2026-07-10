@@ -13,6 +13,15 @@ _(Boş — sıradaki iş buraya)_
 
 ---
 
+## 2026-07-10 — SSH dayanıklılık: harden-sshd.sh + sunucu drop-in
+
+- `tools/sh/harden-sshd.sh`: `99-gi-keepalive.conf` (ClientAlive, MaxStartups, UseDNS no…).
+- Port/key değiştirmez; `sshd -t` + reload; yedek `/etc/ssh/backup-gi/`.
+- AGENTS + tools/sh/README + YAPILACAKLAR (private/local) notları.
+- Sunucuya uygulandı (reload ssh).
+
+---
+
 ## 2026-07-10 — Ülke seçim ekranı: üst satır kesilme (desktop + mobil)
 
 - `#screen-country`: `justify-content:flex-start` + kaydırma; ortalanmış flex üst kartları kesiyordu.

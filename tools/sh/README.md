@@ -16,6 +16,7 @@ bash tools/sh/<script>.sh [args]
 | `INSTALL.sh` | Çoklu distro/mimari: git, rsync, curl, ca-certificates, openssh, nodejs (+ opsiyonel nginx) kontrol + onaylı kurulum |
 | `release.sh` | **Bilinçli release:** `/var/www/html/oyungrok` → site kökü `/var/www/html/` (index + css/js/lang/assets/music). `/oyun/` ve `/oyungrok/` silinmez |
 | `deploy-from-github.sh` | Public sarmalayıcı: private secrets deploy scriptine yönlendirir (yoksa yardım mesajı) |
+| `harden-sshd.sh` | SSH kopma riskini azaltır: `sshd_config.d/99-gi-keepalive.conf` (ClientAlive, MaxStartups, UseDNS no). **Port/key değiştirmez** |
 
 ### Sık kullanım
 
@@ -34,6 +35,9 @@ bash ~/global-impact-work/kuresel-etki-secrets/deploy/deploy-from-github.sh
 
 # Site kökü sürüm (bilinçli; her işte değil)
 bash /var/www/html/oyungrok/tools/sh/release.sh --yes
+
+# SSH dayanıklılık (sunucuda bir kez / güncelleme)
+bash tools/sh/harden-sshd.sh --yes
 ```
 
 ---
@@ -44,6 +48,7 @@ bash /var/www/html/oyungrok/tools/sh/release.sh --yes
 2. **Site kökü (`/`):** yalnızca kullanıcı isterse veya bilerek `release.sh`. Otomatik her commit’te çalıştırma.  
 3. **`/oyun/` asla** yazma/silme (eski stabil).  
 4. Yeni shell betikleri buraya (`tools/sh/`); Node araçları `tools/js/`.  
-5. Yeni `.sh` dosyalarında LF satır sonu kullan; Windows CRLF bozabilir.
+5. Yeni `.sh` dosyalarında LF satır sonu kullan; Windows CRLF bozabilir.  
+6. **SSH:** `harden-sshd.sh` idempotent ve güvenli sayılır. Port/key/fail2ban agresif ban **kullanıcı onayı olmadan yapma**. Kilit: OCI Console connection.
 
 Node yardımcıları: **[../js/README.md](../js/README.md)**

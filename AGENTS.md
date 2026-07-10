@@ -208,6 +208,11 @@ Konsolda: `GAME.countNewsTemplates()`, `GAME.testInstrumentPaging()`.
    - **Git erişimi varsa** private: `https://github.com/snipeTR/kuresel-etki-secrets`
      (`YAPILACAKLAR.md`, `ssh/*`). Public’e sızdırma.
    - Yoksa yalnızca `YAPILACAKLAR.example.md`.
+   - **SSH dayanıklılık (sunucu):** `tools/sh/harden-sshd.sh` → drop-in  
+     `/etc/ssh/sshd_config.d/99-gi-keepalive.conf`  
+     (UseDNS no, ClientAlive*, MaxStartups, LoginGraceTime).  
+     **Yapma:** anahtar değiştirme, Port değiştirme, fail2ban’ı izinsiz agresif kurma,  
+     yedeksiz `sshd_config` rewrite. Kilitlenince OCI **Console connection**.
 4. **Enstrüman silme.**  
    - **Geliştirme / günlük deploy:** yalnız `/oyungrok/` (`tools/sh/deploy-from-github.sh` / secrets deploy).  
    - **Site kökü (/**) release:** yalnızca bilinçli `tools/sh/release.sh` — otomatik her işte çalıştırma.  
@@ -246,12 +251,14 @@ tools/
     INSTALL.sh
     release.sh
     deploy-from-github.sh
+    harden-sshd.sh       # sunucu SSH dayanıklılık (drop-in; port/key değiştirmez)
 ```
 
 - **Tek seferlik `patch-*.js` ekleme / bırakma.** Kalıcı iş kaynak dosyaya veya `tools/js` senkron scriptlerine.
 - Yeni Node aracı → `tools/js/`; shell → `tools/sh/`. README’leri güncelle.
 - Node script kök yolu: `path.join(__dirname, '../..')`.
 - Oyun runtime: `index.html` → `js/`, `lang/`, `css/` — **tools yüklenmez**.
+- Sunucu SSH sertleştirme: `bash tools/sh/harden-sshd.sh --yes` (sshd -t + reload; yedek `/etc/ssh/backup-gi/`).
 
 ### 10.0b Yardım / about metinleri
 
