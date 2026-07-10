@@ -238,6 +238,15 @@ node tools/sync-instrument-descs.js --check
 
 Maliyet/kurallar için `js/ui/panels.js` → `CROSS_RULES` ve `instrumentDetail` dinamik notları da güncelle.
 
+### 10.2 Haber akışı sözlüğü (`glossary.js`)
+
+Dünya olayları satırlarında teknik terimler `*` ile işaretlenir (`GAME.annotateGlossaryText`).
+
+- Sözlük: `js/data/glossary.js` → `GAME.GLOSSARY_BY_LANG.tr` / `.en`
+- Yeni terim: **TR ve EN** birlikte ekle (uzun ifadeler önce eşleşir).
+- Açıklama: günlük dil; zorunlu teknik kelime varsa aynı metinde sadeleştir.
+- Sonra CHANGELOG + git push + sunucu deploy (madde 11 / yayın üçlüsü).
+
 ---
 
 ## 11. Çoklu dil (i18n) — koru

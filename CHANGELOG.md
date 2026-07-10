@@ -13,6 +13,16 @@ _(Boş — sıradaki iş buraya)_
 
 ---
 
+## 2026-07-10 — Dünya olayları ekonomi sözlüğü (* terimler)
+
+- `js/data/glossary.js`: TR/EN sade dil sözlüğü (enflasyon, rezerv, yaptırım, QE…).
+- Haber satırlarında terimler `terim*` olarak işaretlenir; hover (masaüstü) / tık (mobil) ile açıklama.
+- Satıra tıklayınca satırdaki tüm terimlerin sade dil özeti.
+- `renderFeed` entegrasyonu; mobil + desktop CSS (`.econ-term`, `#glossary-pop`).
+- i18n: `glossary_*`, `effect_label`, `feed_empty`.
+
+---
+
 ## 2026-07-10 — Tooltip desc senkronu + ajan yayın/desc kuralları
 
 - Makro/FX `instruments.js` desc metinleri lang pack ile hizalandı.

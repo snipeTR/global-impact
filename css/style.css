@@ -265,6 +265,35 @@ body.viewport-blocked .screen{visibility:hidden; pointer-events:none;}
 .irc-line.imp{font-weight:bold;}
 .irc-line.t4{color:var(--orange);}
 .irc-line.t5{color:var(--red);}
+.irc-line.irc-glossable{cursor:help;}
+/* Ekonomi terimi: * işaretli, tıklanır/hover */
+.econ-term{
+  color:#000080; border-bottom:1px dotted #000080; cursor:help;
+  font-weight:inherit; white-space:nowrap;
+}
+.econ-term:hover, .econ-term:focus{
+  background:#ffffcc; outline:none;
+}
+.glossary-pop{
+  background:var(--face); color:var(--text);
+  border:2px solid; border-color:#ffffff #404040 #404040 #ffffff;
+  box-shadow:4px 4px 0 rgba(0,0,0,.35);
+  padding:8px 10px; font-size:12px; line-height:1.45;
+  max-height:50vh; overflow-y:auto;
+}
+.glossary-pop.hidden{display:none !important;}
+.glossary-pop .gpop-title{
+  font-weight:bold; color:var(--navy); margin-bottom:6px;
+  border-bottom:1px solid #808080; padding-bottom:3px;
+}
+.glossary-pop .gpop-body{margin-bottom:4px;}
+.glossary-pop .gpop-hint{font-size:10px; color:var(--dim); margin-top:6px;}
+.glossary-pop .gpop-close{text-align:right; margin-top:6px;}
+body.mobile-ui .glossary-pop{
+  max-width:94vw !important; max-height:42vh;
+  font-size:13px; line-height:1.5;
+}
+body.mobile-ui .econ-term{ border-bottom-width:2px; padding:0 1px; }
 .irc-time{color:#808080;}
 .irc-nick{font-weight:bold;}
 .irc-status-line{color:#008000;}

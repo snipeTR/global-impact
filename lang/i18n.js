@@ -435,4 +435,6 @@ GAME.afterLangChange = function () {
   }
   if (GAME.Music && GAME.Music.updateButtons) GAME.Music.updateButtons();
   if (GAME.i18n && GAME.i18n.renderAllLangSwitchers) GAME.i18n.renderAllLangSwitchers();
+  if (typeof GAME.renderFeed === 'function' && GAME.state) GAME.renderFeed();
+  if (typeof GAME.hideGlossaryPop === 'function') GAME.hideGlossaryPop();
 };

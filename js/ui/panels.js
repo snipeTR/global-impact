@@ -195,6 +195,8 @@ GAME.renderFeed = function () {
   else if (f !== 'all') items = items.filter(m => m.cat === f);
   items = items.slice(-120); // kanalda son 120 satır
 
+  if (GAME.bindGlossaryUiOnce) GAME.bindGlossaryUiOnce();
+
   let lastTurn = null, prevKey = null, prevBold = false;
   items.forEach(m => {
     // Çeyrek değişiminde kalın ayırıcı çizgi
@@ -210,17 +212,23 @@ GAME.renderFeed = function () {
     const cid = GAME.sourceCid(m.source);
     const toneCls = m.tone === 5 ? ' t5' : m.tone === 4 ? ' t4' : '';
     const impCls = m.important ? ' imp' : '';
-    const effect = m.effect ? ' <span class="irc-effect">(Etki: ' + m.effect + ')</span>' : '';
+    const gloss = GAME.glossNewsParts
+      ? GAME.glossNewsParts(m)
+      : { title: m.title, body: m.body || '', effect: m.effect ? ' <span class="irc-effect">(Etki: ' + m.effect + ')</span>' : '', raw: [m.title, m.body, m.effect].filter(Boolean).join(' — ') };
     if (cid) {
       // ülke mesajı: [27Q2] <🇨🇳 Çin> başlık — gövde
-      const nick = '<span class="irc-nick" style="color:' + GAME.NICK_COLORS[cid] + '">&lt;' + m.source + '&gt;</span> ';
-      div.className = 'irc-line' + toneCls + impCls;
-      div.innerHTML = time + nick + m.title + (m.body ? ' — ' + m.body : '') + effect;
+      const nick = '<span class="irc-nick" style="color:' + GAME.NICK_COLORS[cid] + '">&lt;' +
+        (GAME.escapeHtml ? GAME.escapeHtml(m.source) : m.source) + '&gt;</span> ';
+      div.className = 'irc-line irc-glossable' + toneCls + impCls;
+      div.innerHTML = time + nick + gloss.title + (gloss.body ? ' — ' + gloss.body : '') + gloss.effect;
     } else {
       // sunucu/sistem bildirimi: *** metin
-      div.className = 'irc-line irc-status-line' + (m.tone === 5 ? ' t5' : '') + impCls;
-      div.innerHTML = time + '*** ' + (m.source ? m.source + ': ' : '') + m.title + (m.body ? ' — ' + m.body : '') + effect;
+      const src = m.source ? (GAME.escapeHtml ? GAME.escapeHtml(m.source) : m.source) + ': ' : '';
+      div.className = 'irc-line irc-status-line irc-glossable' + (m.tone === 5 ? ' t5' : '') + impCls;
+      div.innerHTML = time + '*** ' + src + gloss.title + (gloss.body ? ' — ' + gloss.body : '') + gloss.effect;
     }
+    if (gloss.raw) div.setAttribute('data-g-raw', gloss.raw);
+    div.setAttribute('title', GAME.t ? GAME.t('ui.glossary_line_hint') : '');
     // Aynı renkte iki ardışık mesaj: biri normal, biri kalın (mIRC okunabilirliği)
     const key = (cid || 'sys') + '|' + toneCls;
     const alt = (key === prevKey) ? !prevBold : false;
@@ -228,7 +236,10 @@ GAME.renderFeed = function () {
     prevBold = alt; prevKey = key;
     feed.appendChild(div);
   });
-  if (!items.length) feed.innerHTML = '<div class="irc-line irc-status-line">*** Bu kanalda henüz mesaj yok.</div>';
+  if (!items.length) {
+    const empty = GAME.t ? GAME.t('ui.feed_empty') : 'Bu kanalda henüz mesaj yok.';
+    feed.innerHTML = '<div class="irc-line irc-status-line">*** ' + (GAME.escapeHtml ? GAME.escapeHtml(empty) : empty) + '</div>';
+  }
   feed.scrollTop = feed.scrollHeight; // mIRC gibi: en yeni altta, otomatik kaydır
 };
 
