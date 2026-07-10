@@ -6,6 +6,8 @@
 Büyük bir küresel felaket sonrası seçtiğin ülkeyi **yalnızca ekonomik enstrümanlarla** yönetirsin. Her faiz, yaptırım veya projenin kısa / orta / uzun vadede tüm dünyaya nasıl yayıldığını görürsün.
 
 > Klasik “kazan-kaybet” yok. Amaç: *“Bu aracı değiştirdiğimde dünyada gerçekten ne oluyor?”* sorusunu yaşamak.
+> <img width="2878" height="1528" alt="image" src="https://github.com/user-attachments/assets/fa698efc-fbc0-4239-8552-1c67d1f13c72" />
+
 
 | | |
 |--|--|
