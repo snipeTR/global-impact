@@ -27,7 +27,7 @@ GAME.INSTRUMENTS = [
 /* ================= TEMEL MAKRO ARAÇLAR (Katman 2 — Numerical) ================= */
 { id:'policy_rate', name:'Merkez Bankası Politika Faizi', layer:2, type:'numerical',
   unit:'%', min:0, max:60, step:0.5, cost:2, escalateCost:true,
-  desc:'Para politikasının ana aracı. Artış: enflasyonu ve kuru baskılar ama büyümeyi yavaşlatır, işsizlik baskısı yaratır.',
+  desc:'Para politikasının ana aracı. Artış enflasyonu ve kuru baskılar; büyümeyi yavaşlatır. Ucuz başlar; her onaylanan kullanımda siyasi sermaye maliyeti +1 artar.',
   pulse:[ {k:'currency', s:'imm',  m:0.9},
           {k:'inflation',s:'short',m:-0.55},
           {k:'growth',  s:'short', m:-0.22},
@@ -38,7 +38,7 @@ GAME.INSTRUMENTS = [
 
 { id:'tax_rate', name:'Vergi Oranı', layer:2, type:'numerical',
   unit:'%', min:5, max:60, step:1, cost:2, escalateCost:true,
-  desc:'Genel vergi yükü. Artış bütçeyi/borcu rahatlatır ama büyümeyi, yatırımı ve toplum desteğini sıkar.',
+  desc:'Genel vergi yükü. Borcu rahatlatır ama büyümeyi ve onayı sıkar. Düşük taban maliyet; her onayda +1 siyasi sermaye.',
   pulse:[ {k:'debt',   s:'short', m:-0.8},
           {k:'growth', s:'short', m:-0.15},
           {k:'approval',s:'imm',  m:-0.8},
@@ -48,7 +48,7 @@ GAME.INSTRUMENTS = [
 
 { id:'public_spending', name:'Kamu Harcaması / Borçlanma', layer:2, type:'numerical',
   unit:'% GDP', min:0, max:20, step:0.5, cost:2, escalateCost:true,
-  desc:'Kamu yatırımı ve harcama seviyesi. Büyümeyi canlandırır ama borç ve enflasyon üretir.',
+  desc:'Kamu yatırımı ve harcama. Büyümeyi canlandırır; borç ve enflasyon üretir. Düşük taban maliyet; her onayda +1 siyasi sermaye.',
   pulse:[ {k:'growth',   s:'short', m:0.35},
           {k:'inflation',s:'short', m:0.25},
           {k:'debt',     s:'med',   m:1.6},
@@ -58,7 +58,7 @@ GAME.INSTRUMENTS = [
 
 { id:'fx_intervention', name:'Döviz Müdahalesi', layer:2, type:'numerical',
   unit:' mlr$', min:0, max:150, step:5, cost:3,
-  desc:'Rezerv satarak kuru savunmak. Ucuz ama sık kullanım siyasi sermaye yenilenmesini aşındırır; enflasyon gecikmeli yükselir. Seviye açık kaldıkça rezerv hızla erir.',
+  desc:'Rezerv satarak kuru savunmak (maliyet 3). Sık kullanım siyasi sermaye yenilenmesini aşındırır (her 4 kullanımda −1 regen); enflasyon ~4 çeyrek gecikmeyle hafif yükselir. Açık kaldıkça rezerv hızla erir.',
   pulse:[ {k:'currency', s:'imm', m:0.09},
           {k:'reserves', s:'imm', m:-1.15} ],
   sustain:[ {k:'currency', m:0.018}, {k:'reserves', m:-0.48} ],

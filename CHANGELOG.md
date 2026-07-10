@@ -13,6 +13,16 @@ _(Boş — sıradaki iş buraya)_
 
 ---
 
+## 2026-07-10 — Tooltip desc senkronu + ajan yayın/desc kuralları
+
+- Makro/FX `instruments.js` desc metinleri lang pack ile hizalandı.
+- Hover `instrumentDetail`: anlık 🏛 maliyet + escalate/FX penaltı notları.
+- `CROSS_RULES` (faiz/vergi/kamu/FX) maliyet kuralları eklendi.
+- `tools/sync-instrument-descs.js` — ajanlar için desc kontrolü (`--check`).
+- `AGENTS.md`: her iş sonrası **yerel + GitHub push + sunucu deploy**; enstrüman desc üçlüsü zorunlu.
+
+---
+
 ## 2026-07-10 — Siyasi sermaye, Sıfırla, makro/FX maliyetleri, EN yardım
 
 ### UI / tur

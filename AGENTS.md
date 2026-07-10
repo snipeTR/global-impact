@@ -209,6 +209,34 @@ Konsolda: `GAME.countNewsTemplates()`, `GAME.testInstrumentPaging()`.
 8. Biten işleri YAPILACAKLAR açık listesinden çıkar; yeni kalıcı kuralı buraya yaz.
 9. Dokümantasyon: `README.md` (TR) + `README-EN.md` (EN).
 10. **CHANGELOG zorunlu:** Her anlamlı değişiklikten sonra `CHANGELOG.md` üstüne tarihli madde ekle (ne / neden / dosyalar). Ajanlar ve sonraki oturumlar buradan tarih okur.
+11. **Yayın üçlüsü (zorunlu — her anlamlı iş bitince):**  
+    a) **Yerel kaydet** (dosyaları yaz).  
+    b) **GitHub public:** `git add` → `git status` (`YAPILACAKLAR.md` yok) → `commit` → `git push origin main` (`snipeTR/global-impact`).  
+    c) **Sunucu:** SSH ile  
+       `bash ~/global-impact-work/kuresel-etki-secrets/deploy/deploy-from-github.sh`  
+       (yalnız `/var/www/html/oyungrok`; **`/oyun/` yazma**).  
+    Gizli dosya değiştiyse ayrıca private `kuresel-etki-secrets` push.  
+    Kullanıcı “sadece local” demedikçe bu üç adım atlanmaz.
+
+### 10.1 Enstrüman tooltip / açıklama senkronu (zorunlu)
+
+Hover özet (`GAME.instrumentDetail`) metni `ins.desc` + dinamik maliyet + `CROSS_RULES` kullanır.
+
+Enstrüman **davranış / maliyet / desc** değişince **üç yer** güncel olmalı:
+
+| Kaynak | Ne |
+|--------|-----|
+| `js/data/instruments.js` | `name` / `desc` (TR baseline) + `cost` / `escalateCost` / etkiler |
+| `lang/tr/pack.js` → `instruments[id]` | TR `name` + `desc` (i18n apply) |
+| `lang/en/pack.js` → `instruments[id]` | EN `name` + `desc` |
+
+Kontrol:
+
+```bash
+node tools/sync-instrument-descs.js --check
+```
+
+Maliyet/kurallar için `js/ui/panels.js` → `CROSS_RULES` ve `instrumentDetail` dinamik notları da güncelle.
 
 ---
 

@@ -257,11 +257,17 @@ GAME.TS_NARR = { imm: 'hemen', short: '3-12 ay içinde', med: '1-3 yıl içinde'
 
 /* Etki motorundaki çapraz çarpan kurallarının insan diliyle açıklaması */
 GAME.CROSS_RULES = {
-  policy_rate: ['Kamu borcu GDP\'nin %100\'ünü aşmışsa tüm etkiler 1.35×; %200+ ise ek 1.15× (borç servisi).',
+  policy_rate: ['Siyasi sermaye: taban 2 + onaylanan kullanım sayısı (her seferinde +1 maliyet).',
+                'Kamu borcu GDP\'nin %100\'ünü aşmışsa tüm etkiler 1.35×; %200+ ise ek 1.15× (borç servisi).',
                 'Sermaye kontrolü (seviye >30) aktifken kur etkisi 1.3× güçlenir.',
                 'Yüksek faiz + yüksek borç her çeyrek borç stokunu büyütür (servis maliyeti).'],
-  fx_intervention: ['Enflasyon %30+ ise 0.7×, %50+ ise ek 0.75× zayıflar.',
-                    'Rezerv 60 mlr$ altındaysa etki 0.5×. Seviye açık kaldıkça her çeyrek rezerv erir.'],
+  tax_rate: ['Siyasi sermaye: taban 2 + onaylanan kullanım sayısı (her seferinde +1 maliyet).'],
+  public_spending: ['Siyasi sermaye: taban 2 + onaylanan kullanım sayısı (her seferinde +1 maliyet).'],
+  fx_intervention: ['Siyasi sermaye maliyeti sabit 3.',
+                    'Her 4 onaylanan kullanımda siyasi sermaye yenilenmesi −1, −2, −3… (floor(uses/4)).',
+                    'Müdahale artışı: enflasyon ~4 çeyrek gecikmeyle hafif ve uzun sızar.',
+                    'Enflasyon %30+ ise kur etkisi 0.7×, %50+ ise ek 0.75× zayıflar.',
+                    'Rezerv 60 mlr$ altındaysa etki 0.5×. Açık kaldıkça rezerv hızla erir.'],
   shadow_fx: ['Rezerv 60 mlr$ altındaysa 0.5×; yüksek enflasyonda etkinlik düşer.'],
   strategic_stock: ['Aktif felaket sırasında etkisi 1.4× güçlenir.'],
   price_controls: ['Felaket sırasında 1.25× daha etkili (kısa vadeli sosyal rahatlama).'],
@@ -332,14 +338,29 @@ GAME.instrumentDetail = function (ins) {
   const basis = ins.type === 'toggle' ? 'Değerler: aktifleştirme başına toplam etki' :
     ins.type === 'slider' ? 'Değerler: tam seviye (100) için — orantılı uygulanır' :
     'Değerler: her +1' + (ins.unit || '') + ' değişim başına';
+  const pid = GAME.state && GAME.state.player;
+  const costNow = (pid && GAME.instrumentCost) ? GAME.instrumentCost(pid, ins.id) : (ins.cost || 8);
   let h = '<div class="tt-head">' + ins.name + '</div>' +
     '<div class="tt-tags">' + typeName + ' · ' + GAME.LAYERS[ins.layer].name + ' · 🏛 ' +
-    (GAME.state && GAME.state.player ? GAME.instrumentCost(GAME.state.player, ins.id) : (ins.cost || 8)) + ' siyasi sermaye' +
+    costNow + ' siyasi sermaye' +
     (ins.targeted ? ' · 🎯 Hedef ülke seçilir' : '') +
     (ins.project ? ' · 🏗 ~' + Math.round(ins.project / 4 * 10) / 10 + ' yıllık proje' : '') + '</div>' +
     '<div>' + ins.desc + '</div>';
 
   const secs = [];
+  /* Dinamik maliyet notları (her hover'da güncel) */
+  if (ins.escalateCost && pid) {
+    const uses = (GAME.pc().instrUseCount && GAME.pc().instrUseCount[ins.id]) || 0;
+    secs.push('<b>🏛 Dinamik maliyet:</b> Şu an <b>' + costNow + '</b> (taban ' + (ins.cost || 2) +
+      ' + ' + uses + ' onaylı kullanım). Her onayda +1.');
+  }
+  if (ins.id === 'fx_intervention' && pid) {
+    const uses = (GAME.pc().instrUseCount && GAME.pc().instrUseCount.fx_intervention) || 0;
+    const pen = GAME.fxRegenPenalty ? GAME.fxRegenPenalty(pid) : Math.floor(uses / 4);
+    secs.push('<b>🏛 FX maliyeti:</b> Sabit <b>3</b> · Onaylı kullanım: <b>' + uses +
+      '</b> · Sermaye yenileme penaltısı: <b>−' + pen + '</b> (her 4 kullanımda −1 daha).' +
+      '<br>Müdahale artışı: enflasyon ~4 çeyrek sonra hafif yükselir.');
+  }
   const by = { imm: [], short: [], med: [], long: [] };
   (ins.pulse || []).forEach(e => by[e.s] && by[e.s].push(e));
   let fx = '';
