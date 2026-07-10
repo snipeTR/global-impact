@@ -68,6 +68,42 @@
   </div>
 </div>
 
+<!-- ============ GELİŞMİŞ AYARLAR (masaüstü) ============ -->
+<div id="screen-advanced" class="screen">
+  <div class="advanced-box">
+    <div class="advanced-titlebar">
+      <h2 data-i18n="ui.adv_title">Gelişmiş Ayarlar</h2>
+      <span class="advanced-sub" data-i18n="ui.adv_sub">Sabitler — excel benzeri tablo (yalnız masaüstü)</span>
+    </div>
+    <div class="advanced-toolbar">
+      <input type="search" id="adv-filter" class="adv-filter" data-i18n-placeholder="ui.adv_filter_ph" placeholder="Filtrele…">
+      <select id="adv-group" class="lang-select">
+        <option value="">Tümü</option>
+      </select>
+      <button type="button" id="adv-save" class="btn btn-primary" data-i18n="ui.adv_save">Kaydet</button>
+      <button type="button" id="adv-export" class="btn" data-i18n="ui.adv_export">Metin dışa aktar</button>
+      <button type="button" id="adv-import" class="btn" data-i18n="ui.adv_import">Metin içe aktar</button>
+      <button type="button" id="adv-reset" class="btn" data-i18n="ui.adv_reset">Varsayılana dön</button>
+      <button type="button" id="adv-back" class="btn" data-i18n="ui.back">Geri</button>
+    </div>
+    <div class="advanced-table-wrap">
+      <table class="advanced-table" id="adv-table">
+        <thead>
+          <tr>
+            <th data-i18n="ui.adv_col_key">Değişken</th>
+            <th data-i18n="ui.adv_col_val">Değer</th>
+            <th data-i18n="ui.adv_col_def">Varsayılan</th>
+            <th data-i18n="ui.adv_col_desc">Açıklama</th>
+          </tr>
+        </thead>
+        <tbody id="adv-tbody"></tbody>
+      </table>
+    </div>
+    <textarea id="adv-text" class="advanced-text hidden" spellcheck="false"></textarea>
+    <p class="advanced-status" id="adv-status"></p>
+  </div>
+</div>
+
 <!-- ============ ÜLKE SEÇİMİ ============ -->
 <div id="screen-country" class="screen">
   <h2 class="screen-title" data-i18n="ui.pick_country">Ülkeni Seç</h2>
@@ -240,6 +276,7 @@
 <script src="js/data/disasters.js"></script>
 <script src="js/data/glossary.js"></script>
 <script src="js/core/state.js"></script>
+<script src="js/core/tunables.js"></script>
 <script src="js/core/effects.js"></script>
 <script src="js/core/internal.js"></script>
 <script src="js/core/diplomacy.js"></script>

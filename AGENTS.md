@@ -238,7 +238,15 @@ node tools/sync-instrument-descs.js --check
 
 Maliyet/kurallar için `js/ui/panels.js` → `CROSS_RULES` ve `instrumentDetail` dinamik notları da güncelle.
 
-### 10.2 Haber akışı sözlüğü (`glossary.js`)
+### 10.2 Gelişmiş ayarlar / tunables (masaüstü)
+
+- Kod: `js/core/tunables.js` — `buildTunableRows`, `applyStoredTunables`, `keTunables_oyungrok`.
+- UI: Ayarlar → **Gelişmiş ayarlar** (excel tablo; mobil gizli).
+- Yeni sabit: `buildTunableRows` içine `get/set` + `desc {tr,en}` ekle; varsayılan `captureTunableDefaults` kapsamına girsin.
+- Enstrüman cost/risk/min/max ve ülke `ind`/`rates` satırları otomatik üretilir.
+- Değişince: CHANGELOG + push + deploy (yayın üçlüsü).
+
+### 10.3 Haber akışı sözlüğü (`glossary.js`)
 
 Dünya olayları satırlarında teknik terimler `*` ile işaretlenir (`GAME.annotateGlossaryText`).
 

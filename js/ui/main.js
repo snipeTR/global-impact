@@ -215,6 +215,8 @@ GAME.tryResumeTurnJob = function () {
 document.addEventListener('DOMContentLoaded', function () {
   /* i18n: dil paketleri yüklü → baseline + kayıtlı dil uygula */
   if (GAME.i18n && GAME.i18n.init) GAME.i18n.init();
+  /* Gelişmiş sabitler (localStorage override) */
+  if (typeof GAME.applyStoredTunables === 'function') GAME.applyStoredTunables();
 
   if (GAME.Music && GAME.Music.bindUnlockOnce) GAME.Music.bindUnlockOnce();
   if (GAME.Music && GAME.Music.bindButtons) GAME.Music.bindButtons();

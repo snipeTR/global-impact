@@ -52,7 +52,9 @@ GAME.updateInternalDynamics = function (eventsOut) {
     c.internal.stability = GAME.clamp(c.internal.stability * 0.7 + GAME.clamp(stTarget, 0, 100) * 0.3, 0, 100);
 
     /* 4. Siyasi sermaye yenilenmesi (FX sık kullanımı regen penaltısı) */
-    let regen = 2 + (c.internal.approval - 50) * 0.06;
+    const base = (GAME.POLCAP_REGEN_BASE != null) ? GAME.POLCAP_REGEN_BASE : 2;
+    const apF = (GAME.POLCAP_REGEN_APPROVAL != null) ? GAME.POLCAP_REGEN_APPROVAL : 0.06;
+    let regen = base + (c.internal.approval - 50) * apF;
     if (typeof GAME.fxRegenPenalty === 'function') regen -= GAME.fxRegenPenalty(cid);
     c.internal.polCap = GAME.clamp(c.internal.polCap + regen, 0, 100);
 

@@ -13,6 +13,16 @@ _(Boş — sıradaki iş buraya)_
 
 ---
 
+## 2026-07-10 — Gelişmiş ayarlar (excel tablo, masaüstü)
+
+- `js/core/tunables.js`: oyun/enstrüman/ülke/timescale sabitleri; `keTunables_oyungrok`.
+- Ayarlar altında **Gelişmiş ayarlar** (yalnız desktop): filtre, grup, kaydet, metin ithalat/ihracat, varsayılana dön.
+- Her satır: değişken | değer | varsayılan | TR/EN açıklama.
+- PolCap regen, FX penaltı/enflasyon gecikmesi, MAX_TURNS, slot, instrument cost… ayarlanabilir.
+- AGENTS §10.2 tunables kuralı.
+
+---
+
 ## 2026-07-10 — Mobil grafik tık + ana menü Ayarlar
 
 - Mobil grafik çipleri: 1. tık aktif, aynı çipe 2. tık açıklama; başka yere tık → kapat.

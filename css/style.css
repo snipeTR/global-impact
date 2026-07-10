@@ -120,6 +120,74 @@ body:not(.mobile-ui) .lang-switcher-mobile-nav{ display:none !important; }
 .settings-actions{flex-direction:column; align-items:flex-start;}
 .settings-hint{font-size:11px; color:#008000;}
 .settings-note{font-size:11px; color:var(--dim); margin-top:8px; line-height:1.45;}
+.settings-advanced-block{
+  margin-top:18px; padding-top:12px;
+  border-top:2px solid; border-color:#808080 #fff #fff #808080;
+}
+.settings-adv-h{font-size:14px; color:var(--navy); margin:0 0 6px;}
+body.mobile-ui .settings-advanced-block{display:none !important;}
+
+/* ---- Gelişmiş ayarlar (excel tablo) ---- */
+#screen-advanced.active{
+  align-items:stretch; justify-content:flex-start; padding:8px;
+  background:#008080;
+}
+.advanced-box{
+  flex:1 1 auto; display:flex; flex-direction:column; min-height:0;
+  width:100%; max-width:1200px; margin:0 auto;
+  background:var(--face);
+  border:2px solid; border-color:#ffffff #404040 #404040 #ffffff;
+  box-shadow:4px 4px 0 rgba(0,0,0,.35);
+}
+.advanced-titlebar{
+  background:linear-gradient(90deg,var(--navy),var(--navy2));
+  color:#fff; padding:6px 10px;
+}
+.advanced-titlebar h2{margin:0; font-size:15px;}
+.advanced-sub{font-size:11px; opacity:.9;}
+.advanced-toolbar{
+  display:flex; flex-wrap:wrap; gap:6px; align-items:center;
+  padding:8px; border-bottom:1px solid #808080;
+}
+.adv-filter{
+  flex:1 1 160px; min-width:120px; padding:4px 6px;
+  border:2px solid; border-color:#808080 #fff #fff #808080;
+  font-family:Tahoma,sans-serif; font-size:12px;
+}
+.advanced-table-wrap{
+  flex:1 1 auto; min-height:200px; overflow:auto;
+  border:2px solid; border-color:#808080 #fff #fff #808080;
+  margin:0 8px 8px; background:#fff;
+}
+.advanced-table{
+  width:100%; border-collapse:collapse; font-size:11px;
+  font-family:Tahoma,"Courier New",monospace;
+}
+.advanced-table th{
+  position:sticky; top:0; background:var(--face);
+  border:1px solid #808080; padding:4px 6px; text-align:left; z-index:1;
+}
+.advanced-table td{
+  border:1px solid #c0c0c0; padding:2px 4px; vertical-align:top;
+}
+.advanced-table .adv-key{white-space:nowrap; max-width:280px;}
+.advanced-table .adv-key code{font-size:10px;}
+.advanced-table .adv-val{min-width:90px;}
+.advanced-table .adv-def{color:#505050; white-space:nowrap;}
+.advanced-table .adv-desc{color:#000; line-height:1.35; min-width:200px;}
+.advanced-table .adv-input{
+  width:100%; box-sizing:border-box; padding:2px 4px;
+  border:1px solid #808080; font-size:11px; font-family:inherit;
+}
+.advanced-table input[type=checkbox].adv-input{width:auto;}
+.advanced-text{
+  flex:1 1 auto; min-height:240px; margin:0 8px 8px; padding:8px;
+  font-family:"Consolas","Courier New",monospace; font-size:11px;
+  border:2px solid; border-color:#808080 #fff #fff #808080;
+  resize:vertical;
+}
+.advanced-status{font-size:11px; color:var(--dim); padding:0 10px 8px; margin:0;}
+body.mobile-ui #screen-advanced{display:none !important;}
 
 /* ---- Nasıl Oynanır ---- */
 .about-box{max-width:860px; padding:0 0 24px; margin:24px; max-height:92vh; overflow-y:auto;}

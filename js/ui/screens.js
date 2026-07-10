@@ -61,6 +61,15 @@ GAME.renderSettings = function () {
     '<button type="button" id="set-reset-gloss" class="btn">' + t('ui.set_reset_glossary') + '</button>' +
     '<span class="settings-hint" id="set-reset-gloss-msg"></span></div>' +
 
+    '<div class="settings-advanced-block' + ((GAME.mobile && GAME.mobile.active) ? ' hidden' : '') + '">' +
+    '<h3 class="settings-adv-h">' + t('ui.adv_section') + '</h3>' +
+    '<p class="settings-note">' + t('ui.adv_section_note') + '</p>' +
+    '<button type="button" id="set-open-advanced" class="btn btn-primary">' + t('ui.adv_open') + '</button>' +
+    '</div>' +
+    ((GAME.mobile && GAME.mobile.active)
+      ? '<p class="settings-note settings-mobile-only">' + t('ui.adv_desktop_only') + '</p>'
+      : '') +
+
     '<p class="settings-note">' + t('ui.set_note') + '</p>';
 
   const langSel = document.getElementById('set-lang');
@@ -93,8 +102,159 @@ GAME.renderSettings = function () {
     if (msg) msg.textContent = t('ui.set_reset_done');
     if (typeof GAME.renderFeed === 'function' && GAME.state) GAME.renderFeed();
   };
+  const advBtn = document.getElementById('set-open-advanced');
+  if (advBtn) {
+    advBtn.onclick = function () {
+      if (GAME.mobile && GAME.mobile.active) {
+        alert(t('ui.adv_desktop_only'));
+        return;
+      }
+      GAME.renderAdvancedSettings();
+    };
+  }
 
   GAME.showScreen('screen-settings');
+};
+
+/* ---- Gelişmiş ayarlar (excel tablo, masaüstü) ---- */
+GAME._advFilter = '';
+GAME._advGroup = '';
+GAME._advTextMode = false;
+
+GAME.renderAdvancedSettings = function () {
+  if (GAME.mobile && GAME.mobile.active) {
+    alert(GAME.t ? GAME.t('ui.adv_desktop_only') : 'Desktop only');
+    GAME.renderSettings();
+    return;
+  }
+  if (GAME.i18n && GAME.i18n.applyDom) GAME.i18n.applyDom();
+  if (typeof GAME.captureTunableDefaults === 'function') GAME.captureTunableDefaults();
+  if (typeof GAME.applyStoredTunables === 'function') {
+    // storage zaten uygulanmış olabilir; tablo mevcut değerleri gösterir
+  }
+
+  const t = (k, v) => (GAME.t ? GAME.t(k, v) : k);
+  const rows = GAME.buildTunableRows ? GAME.buildTunableRows() : [];
+  const groups = [];
+  rows.forEach(r => { if (groups.indexOf(r.group) < 0) groups.push(r.group); });
+
+  const gSel = document.getElementById('adv-group');
+  if (gSel) {
+    const cur = GAME._advGroup || '';
+    gSel.innerHTML = '<option value="">' + t('ui.adv_all_groups') + '</option>' +
+      groups.map(g => '<option value="' + g + '"' + (cur === g ? ' selected' : '') + '>' + g + '</option>').join('');
+    gSel.onchange = function () {
+      GAME._advGroup = gSel.value;
+      GAME._fillAdvancedTable();
+    };
+  }
+  const filt = document.getElementById('adv-filter');
+  if (filt) {
+    filt.value = GAME._advFilter || '';
+    filt.oninput = function () {
+      GAME._advFilter = filt.value;
+      GAME._fillAdvancedTable();
+    };
+  }
+
+  const textArea = document.getElementById('adv-text');
+  const tableWrap = document.querySelector('.advanced-table-wrap');
+  GAME._advTextMode = false;
+  if (textArea) { textArea.classList.add('hidden'); textArea.value = ''; }
+  if (tableWrap) tableWrap.classList.remove('hidden');
+
+  document.getElementById('adv-save').onclick = function () {
+    // tablo veya metin
+    if (GAME._advTextMode) {
+      const n = GAME.applyTunablesText(document.getElementById('adv-text').value);
+      GAME.writeTunablesToStorage(GAME.collectTunablesObject());
+      document.getElementById('adv-status').textContent = t('ui.adv_saved', { n: n });
+      GAME._advTextMode = false;
+      textArea.classList.add('hidden');
+      if (tableWrap) tableWrap.classList.remove('hidden');
+      GAME._fillAdvancedTable();
+      return;
+    }
+    const tbody = document.getElementById('adv-tbody');
+    const obj = GAME.collectTunablesObject();
+    tbody.querySelectorAll('tr[data-id]').forEach(tr => {
+      const id = tr.getAttribute('data-id');
+      const input = tr.querySelector('input, select');
+      if (!input) return;
+      const row = rows.find(r => r.id === id);
+      if (!row) return;
+      const val = row.type === 'bool' ? input.checked : input.value;
+      try {
+        row.set(GAME.parseTunableValue(row.type, val));
+        obj[id] = row.get();
+      } catch (e) { /* skip */ }
+    });
+    GAME.writeTunablesToStorage(obj);
+    document.getElementById('adv-status').textContent = t('ui.adv_saved', { n: Object.keys(obj).length });
+  };
+
+  document.getElementById('adv-export').onclick = function () {
+    GAME._advTextMode = true;
+    if (tableWrap) tableWrap.classList.add('hidden');
+    textArea.classList.remove('hidden');
+    textArea.value = '# key=value\n' + GAME.exportTunablesText();
+    document.getElementById('adv-status').textContent = t('ui.adv_export_hint');
+  };
+
+  document.getElementById('adv-import').onclick = function () {
+    GAME._advTextMode = true;
+    if (tableWrap) tableWrap.classList.add('hidden');
+    textArea.classList.remove('hidden');
+    if (!textArea.value.trim()) textArea.value = '# key=value\n' + GAME.exportTunablesText();
+    document.getElementById('adv-status').textContent = t('ui.adv_import_hint');
+  };
+
+  document.getElementById('adv-reset').onclick = function () {
+    if (!confirm(t('ui.adv_reset_confirm'))) return;
+    GAME.resetTunablesToDefaults();
+    GAME._fillAdvancedTable();
+    document.getElementById('adv-status').textContent = t('ui.adv_reset_done');
+  };
+
+  document.getElementById('adv-back').onclick = function () {
+    GAME.renderSettings();
+  };
+
+  GAME._fillAdvancedTable();
+  GAME.showScreen('screen-advanced');
+};
+
+GAME._fillAdvancedTable = function () {
+  const tbody = document.getElementById('adv-tbody');
+  if (!tbody || !GAME.buildTunableRows) return;
+  const rows = GAME.buildTunableRows();
+  const q = (GAME._advFilter || '').toLowerCase();
+  const g = GAME._advGroup || '';
+  tbody.innerHTML = '';
+  rows.forEach(r => {
+    if (g && r.group !== g) return;
+    const desc = GAME.tunableDesc(r.desc);
+    const blob = (r.id + ' ' + desc + ' ' + r.group).toLowerCase();
+    if (q && blob.indexOf(q) < 0) return;
+    const tr = document.createElement('tr');
+    tr.setAttribute('data-id', r.id);
+    const val = r.get();
+    let control;
+    if (r.type === 'bool') {
+      control = '<input type="checkbox" class="adv-input"' + (val ? ' checked' : '') + '>';
+    } else {
+      control = '<input type="text" class="adv-input" value="' +
+        GAME.escapeHtml(GAME.formatTunableValue(r.type, val)) + '">';
+    }
+    tr.innerHTML =
+      '<td class="adv-key"><code>' + GAME.escapeHtml(r.id) + '</code></td>' +
+      '<td class="adv-val">' + control + '</td>' +
+      '<td class="adv-def">' + GAME.escapeHtml(GAME.formatTunableValue(r.type, r.def)) + '</td>' +
+      '<td class="adv-desc">' + GAME.escapeHtml(desc) + '</td>';
+    tbody.appendChild(tr);
+  });
+  const st = document.getElementById('adv-status');
+  if (st && !st.textContent) st.textContent = rows.length + ' vars';
 };
 
 /* ---- Nasıl oynanır (detaylı + konu butonları) ---- */

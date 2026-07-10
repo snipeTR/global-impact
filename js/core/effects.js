@@ -123,12 +123,15 @@ GAME.applyInstrumentChange = function (cid, ins, oldVal, newVal, target) {
     else GAME.addPulse(cid, e.k, e.m * delta * mult, e.s, srcName);
   });
 
-  /* Döviz müdahalesi artışı: küçük enflasyon, 4 çeyrek gecikmeli, uzun sızma */
+  /* Döviz müdahalesi artışı: küçük enflasyon, gecikmeli sızma (tunables ile ayarlanır) */
   if (ins.id === 'fx_intervention' && newVal > oldVal) {
     const mag = Math.min(1.2, (newVal - oldVal) / 30);
-    const inflTotal = 0.32 * Math.max(0.25, mag);
+    const base = (GAME.FX_INFL_TOTAL_BASE != null) ? GAME.FX_INFL_TOTAL_BASE : 0.32;
+    const delay = (GAME.FX_INFL_DELAY != null) ? GAME.FX_INFL_DELAY : 4;
+    const dur = Math.max(1, (GAME.FX_INFL_DUR != null) ? GAME.FX_INFL_DUR : 12);
+    const inflTotal = base * Math.max(0.25, mag);
     s.activeEffects.push({
-      cid: cid, k: 'inflation', perTurn: inflTotal / 12, delay: 4, left: 12,
+      cid: cid, k: 'inflation', perTurn: inflTotal / dur, delay: delay, left: dur,
       src: srcName + ' (gecikmeli enflasyon)'
     });
   }

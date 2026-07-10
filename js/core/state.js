@@ -159,12 +159,13 @@ GAME.recordInstrumentUse = function (cid, insId) {
   c.instrUseCount[insId] = (c.instrUseCount[insId] || 0) + 1;
 };
 
-/* Döviz müdahalesi: her 4 kullanımda regen −1, −2, −3… */
+/* Döviz müdahalesi regen penaltısı — asıl tanım tunables.js (FX_REGEN_EVERY) */
 GAME.fxRegenPenalty = function (cid) {
-  const c = GAME.state.countries[cid];
+  const c = GAME.state && GAME.state.countries[cid];
   if (!c || !c.instrUseCount) return 0;
   const uses = c.instrUseCount.fx_intervention || 0;
-  return Math.floor(uses / 4);
+  const every = Math.max(1, GAME.FX_REGEN_EVERY || 4);
+  return Math.floor(uses / every);
 };
 
 GAME.clearPending = function () {
