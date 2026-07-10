@@ -304,7 +304,8 @@ GAME.renderChartControls = function () {
     b.textContent = sr.name;
     const tip = GAME.chartTipText(sr.id);
     if (tip) {
-      b.title = tip;
+      // title yok: tarayıcının beyaz native tooltip'i çift mesaj yaratıyordu
+      b.removeAttribute('title');
       b.setAttribute('aria-label', sr.name + '. ' + tip);
       b.onmouseenter = (e) => GAME.showChartChipTip(sr.id, b, e);
       b.onmouseleave = () => GAME.hideChartChipTip();
