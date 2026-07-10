@@ -13,7 +13,9 @@ GAME.HDR_SHORT = {
 /* ================= HEADER ================= */
 GAME.renderHeader = function () {
   const s = GAME.state;
-  document.getElementById('hdr-country').textContent = GAME.pdef().flag + ' ' + GAME.pdef().name;
+  document.getElementById('hdr-country').innerHTML = GAME.flagLabelHtml
+    ? GAME.flagLabelHtml(s.player, GAME.pdef().name, { size: 'md' })
+    : (GAME.pdef().flag + ' ' + GAME.pdef().name);
   document.getElementById('hdr-date').textContent = GAME.turnDate(s.turn) + '  (Tur ' + s.turn + '/' + GAME.MAX_TURNS + ')';
   document.getElementById('hdr-polcap').innerHTML = '🏛 <b>' + Math.round(GAME.pc().internal.polCap) + '</b>';
   const used = s.pending.length;
@@ -33,13 +35,15 @@ GAME.renderHeader = function () {
     if (cid === s.player) {
       chip.style.borderColor = '#000080'; chip.style.color = '#000080';
       chip.style.background = '#e8e8ff';
-      chip.textContent = def.flag + short;
+      chip.innerHTML = (GAME.flagHtml ? GAME.flagHtml(cid, { size: 'sm' }) : def.flag) +
+        '<span>' + short + '</span>';
       chip.title = def.name + ' (sen) — haritada göster';
     } else {
       const rel = GAME.getRelation(s.player, cid);
       chip.style.borderColor = GAME.relationColor(rel);
       chip.style.color = GAME.relationColor(rel);
-      chip.textContent = def.flag + short;
+      chip.innerHTML = (GAME.flagHtml ? GAME.flagHtml(cid, { size: 'sm' }) : def.flag) +
+        '<span>' + short + '</span>';
       chip.title = def.name + ' — İlişki: ' + Math.round(rel) + ' (haritada göster)';
     }
     chip.onclick = () => GAME.openMapModal(cid);
@@ -50,7 +54,8 @@ GAME.renderHeader = function () {
 /* ================= SOL PANEL ================= */
 GAME.renderLeftPanel = function () {
   const s = GAME.state, c = GAME.pc(), def = GAME.pdef();
-  document.getElementById('left-country-head').innerHTML = def.flag + ' ' + def.name +
+  document.getElementById('left-country-head').innerHTML =
+    (GAME.flagLabelHtml ? GAME.flagLabelHtml(s.player, def.name, { size: 'md' }) : (def.flag + ' ' + def.name)) +
     ' <span style="font-size:11px;color:#505050">(' + def.gov + ')</span>';
 
   // Göstergeler + değişim okları
@@ -662,7 +667,8 @@ GAME.openInstrumentModal = function (ins) {
         const rel = Math.round(GAME.getRelation(s.player, o));
         const tb = document.createElement('button');
         tb.className = 'btn target-btn';
-        tb.innerHTML = '<span>' + def.flag + ' ' + def.name + '</span><span style="color:' + GAME.relationColor(rel) + '">' + rel + '</span>';
+        tb.innerHTML = '<span>' + (GAME.flagLabelHtml ? GAME.flagLabelHtml(o, def.name, { size: 'sm' }) : (def.flag + ' ' + def.name)) +
+          '</span><span style="color:' + GAME.relationColor(rel) + '">' + rel + '</span>';
         tb.onclick = () => addPending(1, o);
         tl.appendChild(tb);
       });
@@ -693,7 +699,8 @@ GAME.openInstrumentModal = function (ins) {
         const rel = Math.round(GAME.getRelation(s.player, o));
         const tb = document.createElement('button');
         tb.className = 'btn target-btn';
-        tb.innerHTML = '<span>' + def.flag + ' ' + def.name + '</span><span style="color:' + GAME.relationColor(rel) + '">' + rel + '</span>';
+        tb.innerHTML = '<span>' + (GAME.flagLabelHtml ? GAME.flagLabelHtml(o, def.name, { size: 'sm' }) : (def.flag + ' ' + def.name)) +
+          '</span><span style="color:' + GAME.relationColor(rel) + '">' + rel + '</span>';
         tb.onclick = () => {
           selectedTarget = o;
           tl.querySelectorAll('.target-btn').forEach(x => x.classList.remove('btn-primary'));

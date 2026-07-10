@@ -13,6 +13,15 @@ _(Boş — sıradaki iş buraya)_
 
 ---
 
+## 2026-07-10 — Ülke bayrakları: PNG + Win95 çerçeve
+
+- Windows’ta emoji bayraklar CA/BR harfine düşüyordu → `assets/flags/*.png` (17 ülke).
+- `js/data/flags.js`: `GAME.flagHtml` / `flagLabelHtml` + ISO eşlemesi.
+- Ülke seçim kartları, header, sol panel, mobil, hedef listesi, harita bilgi paneli.
+- CSS: `.flag-win95` (kabartmalı çerçeve, sm/md/lg).
+
+---
+
 ## 2026-07-10 — Chat satır ipucu: imleç yanı (desktop); mobilde yok
 
 - Native `title` kaldırıldı (beyaz sistem balonu + çift ipucu).

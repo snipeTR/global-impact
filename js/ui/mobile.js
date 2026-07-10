@@ -164,7 +164,9 @@ GAME.syncMobileChrome = function () {
   const pdef = GAME.pdef();
   const s = GAME.state;
   const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
-  set('m-hdr-country', pdef.flag + ' ' + pdef.name);
+  set('m-hdr-country', GAME.flagLabelHtml
+    ? GAME.flagLabelHtml(s.player, pdef.name, { size: 'sm' })
+    : (pdef.flag + ' ' + pdef.name));
   set('m-hdr-date', GAME.turnDate(s.turn) + ' · T' + s.turn + '/' + GAME.MAX_TURNS);
   set('m-hdr-polcap', '🏛 <b>' + Math.round(GAME.pc().internal.polCap) + '</b>');
   const used = s.pending.length;
@@ -185,7 +187,8 @@ GAME.renderMobileMapChips = function () {
     b.type = 'button';
     b.className = 'btn m-map-chip';
     const rel = cid === GAME.state.player ? null : GAME.getRelation(GAME.state.player, cid);
-    b.textContent = def.flag + ' ' + def.name;
+    b.innerHTML = (GAME.flagHtml ? GAME.flagHtml(cid, { size: 'sm' }) : def.flag) +
+      ' <span>' + def.name + '</span>';
     if (cid === GAME.state.player) {
       b.style.borderColor = '#000080';
       b.style.fontWeight = 'bold';

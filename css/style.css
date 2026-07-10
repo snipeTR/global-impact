@@ -245,8 +245,48 @@ body.mobile-ui #screen-advanced{display:none !important;}
 .country-card:hover{background:#d4d4d4;}
 .country-card:hover h3{color:#fff; background:var(--navy); padding:0 4px;}
 .country-card:active{border-color:#404040 #ffffff #ffffff #404040;}
-.country-card .flag{font-size:38px;}
+.country-card .flag{font-size:38px; line-height:1; margin-bottom:4px;}
+.country-card .flag .flag-win95{vertical-align:middle;}
 .country-card h3{margin:6px 0 2px; font-size:17px; display:inline-block;}
+
+/* ---- Bayraklar (PNG + Win95 çerçeve; emoji yerine) ---- */
+.flag-win95{
+  display:inline-flex; align-items:center; justify-content:center;
+  vertical-align:middle;
+  box-sizing:border-box;
+  background:#c0c0c0;
+  border:2px solid;
+  border-color:#ffffff #404040 #404040 #ffffff;
+  padding:2px;
+  box-shadow:inset 1px 1px 0 #dfdfdf;
+  line-height:0;
+  flex-shrink:0;
+}
+.flag-win95 img{
+  display:block;
+  object-fit:cover;
+  image-rendering:auto;
+  /* hafif “eski UI” keskinlik */
+  image-rendering:-webkit-optimize-contrast;
+  border:1px solid #808080;
+  background:#000080;
+}
+.flag-win95.flag-sm{ padding:1px; border-width:1px; }
+.flag-win95.flag-sm img{ width:16px; height:11px; border-width:1px; }
+.flag-win95.flag-md img{ width:28px; height:18px; }
+.flag-win95.flag-lg img{ width:48px; height:32px; }
+.flag-win95.flag-emoji-fallback{
+  font-size:22px; line-height:1; padding:2px 4px; min-width:28px; min-height:18px;
+}
+.flag-label-text{ vertical-align:middle; }
+.map-chip .flag-win95{ margin-right:2px; }
+.map-chip{ display:inline-flex; align-items:center; gap:2px; }
+#hdr-country, #left-country-head, #m-hdr-country{
+  display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap;
+}
+.target-btn{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.target-btn .flag-win95{ flex-shrink:0; }
+.m-map-chip{ display:inline-flex; align-items:center; gap:4px; }
 .country-card .diff{font-size:12px; font-weight:bold; margin-bottom:8px;}
 .diff-kolay{color:var(--green);} .diff-orta{color:var(--gold);} .diff-zor{color:var(--red);}
 .country-card .desc{font-size:12px; color:var(--dim); line-height:1.5; margin-bottom:10px; min-height:54px;}

@@ -349,7 +349,7 @@ GAME.renderCountrySelect = function () {
         : (def.difficulty.includes('Kolay') || /easy/i.test(def.difficulty) ? 'diff-kolay' : 'diff-orta'));
     const L = (k, v) => (GAME.t ? GAME.t(k, v) : k);
     card.innerHTML =
-      '<div class="flag">' + def.flag + '</div>' +
+      '<div class="flag">' + (GAME.flagHtml ? GAME.flagHtml(cid, { size: 'lg' }) : def.flag) + '</div>' +
       '<h3>' + def.name + '</h3>' +
       '<div class="diff ' + diffCls + '">' + L('ui.difficulty', { d: def.difficulty }) + '</div>' +
       '<div class="desc">' + def.desc + '</div>' +
@@ -529,7 +529,10 @@ GAME.buildMapInfoPanel = function (selCid) {
   const relHtml = selCid === s.player ? '<b style="color:#000080">Bu senin ülken</b>' :
     'İlişki (sana): <b style="color:' + GAME.relationColor(rel) + '">' + rel + '</b>';
   const partners = Object.entries(links).sort((a, b) => b[1] - a[1]).slice(0, 4)
-    .map(([pid, w]) => GAME.COUNTRIES[pid].flag + ' ' + GAME.COUNTRIES[pid].name + ' %' + Math.round(w * 100)).join('<br>');
+    .map(([pid, w]) => {
+      const nm = GAME.COUNTRIES[pid].name + ' %' + Math.round(w * 100);
+      return GAME.flagLabelHtml ? GAME.flagLabelHtml(pid, nm, { size: 'sm' }) : (GAME.COUNTRIES[pid].flag + ' ' + nm);
+    }).join('<br>');
   const ops = [];
   GAME.INSTRUMENTS.filter(i => i.targeted).forEach(i => {
     for (const a in s.countries) {
@@ -540,7 +543,8 @@ GAME.buildMapInfoPanel = function (selCid) {
     }
   });
   return '<div class="map-info">' +
-    '<h4>ÜLKE</h4><b>' + sel.flag + ' ' + sel.name + '</b> (' + sel.gov + ', ' + sel.difficulty + ')<br>' + relHtml +
+    '<h4>ÜLKE</h4><b>' + (GAME.flagLabelHtml ? GAME.flagLabelHtml(selCid, sel.name, { size: 'sm' }) : (sel.flag + ' ' + sel.name)) +
+    '</b> (' + sel.gov + ', ' + sel.difficulty + ')<br>' + relHtml +
     '<h4>GÖSTERGELER</h4>' +
     'Büyüme: <b>%' + GAME.fmt(c.ind.growth, 1) + '</b> · Enflasyon: <b>%' + GAME.fmt(c.ind.inflation, 1) + '</b><br>' +
     'Para Birimi: <b>' + GAME.fmt(c.ind.currency, 0) + '</b> · Rezerv: <b>' + GAME.fmt(c.ind.reserves, 0) + ' mlr$</b><br>' +
@@ -942,7 +946,8 @@ GAME.openMapModal = function (selCid) {
       label.setAttribute('class', 'map-marker');
       label.setAttribute('data-cid', cid);
       label.style.cursor = 'pointer';
-      label.textContent = def.flag + ' ' + def.name;
+      /* SVG text: emoji Windows'ta harf; yalnızca ad (bayrak nokta rengi ile) */
+      label.textContent = def.name;
       label.addEventListener('click', (ev) => goCountry(cid, ev));
       overlay.appendChild(label);
     }
@@ -978,7 +983,9 @@ GAME.showEndScreen = function () {
   const dis = s.disaster ? GAME.DISASTERS.find(d => d.id === s.disaster.id) : null;
 
   box.innerHTML =
-    '<p style="text-align:center;color:#505050">' + def.flag + ' ' + def.name + ' — ' + GAME.turnDate(1) + ' → ' + GAME.turnDate(s.turn) + '</p>' +
+    '<p style="text-align:center;color:#505050">' +
+    (GAME.flagLabelHtml ? GAME.flagLabelHtml(s.player, def.name, { size: 'sm' }) : (def.flag + ' ' + def.name)) +
+    ' — ' + GAME.turnDate(1) + ' → ' + GAME.turnDate(s.turn) + '</p>' +
     (dis ? '<p style="text-align:center">' + t('ui.lived_disaster') + '<b>' + dis.icon + ' ' + dis.name + '</b> (' + GAME.turnDate(s.disaster.startTurn) + ')</p>' : '') +
     '<h3>' + t('ui.end_h_legacy') + '</h3>' + legacyHtml +
     (worldLegacy ? '<h3>' + t('ui.end_h_world') + '</h3>' + worldLegacy : '') +

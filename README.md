@@ -321,7 +321,9 @@ global-impact/
 ├── index.html              # Tüm ekranlar + #mobile-chrome kabuğu
 ├── css/style.css           # Win95 tema + body.mobile-ui
 ├── lang/                   # i18n çekirdek + tr/ + en/
-├── assets/world-map.svg    # ISO path’li dünya haritası
+├── assets/
+│   ├── world-map.svg       # ISO path’li dünya haritası
+│   └── flags/*.png         # 17 ülke bayrağı (Win95 çerçeveli UI)
 ├── music/                  # normal, felaket, diplomasi, savas
 ├── js/
 │   ├── data/
@@ -771,6 +773,7 @@ Daha fazlası: kod yorumları + **AGENTS.md** bölüm 1–10.
 ## Lisans / varlıklar
 
 - Dünya haritası SVG: [simple-world-map](https://github.com/flekschas/simple-world-map) türevi (**CC BY-SA 3.0**).  
+- Ülke bayrakları PNG: `assets/flags/` (flagcdn / genel kullanım bayrak grafikleri; UI’da Win95 çerçeve).  
 - Oyun kodu: repo sahibi / proje lisansına bakın (belirtilmemişse katkı öncesi netleştirin).  
 - Müzik dosyaları (`music/*.mp3`): projeye özel; yeniden dağıtım hakkını kontrol edin.
 

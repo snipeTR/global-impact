@@ -213,7 +213,7 @@ global-impact/
 ├── index.html
 ├── css/style.css
 ├── lang/                   # i18n
-├── assets/world-map.svg
+├── assets/                 # world-map.svg + flags/*.png (Win95 UI)
 ├── music/
 ├── js/data/                # countries, instruments, disasters, glossary
 ├── js/core/                # state, tunables, effects, turn, ai…
